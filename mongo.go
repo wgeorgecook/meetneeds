@@ -8,8 +8,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"io/ioutil"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -63,30 +63,16 @@ func updateDocument(w http.ResponseWriter, r *http.Request) {
 	collection := mongoClient.Database(cfg.Database).Collection(cfg.Collection)
 
 	id := r.URL.Query()["id"][0]
+	isMetString := r.URL.Query()["isMet"][0]
+
+	isMet, err := strconv.ParseBool(isMetString)
+	if err != nil {
+		log.Errorf("error in updateRecord: %v", err)
+		w.Write([]byte(err.Error()))
+		return
+	}
 	// create an OID bson primitive based on the ID that comes in on the request
 	oid, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		log.Errorf("error in updateRecord: %v", err)
-	}
-
-	// make a request to the local getRecord endpoint to get the document we need to update
-	resp, err := http.Get(fmt.Sprintf("http://127.0.0.1:%v?id=%v", cfg.Port, id))
-	if err != nil {
-		log.Errorf("error in updateRecord: %v", err)
-		w.Write([]byte(err.Error()))
-		return
-	}
-
-	// unmarshal the response into our need struct
-	respBytes, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Errorf("error in updateRecord: %v", err)
-		w.Write([]byte(err.Error()))
-		return
-	}
-
-	var n need
-	err = json.Unmarshal(respBytes, &n)
 	if err != nil {
 		log.Errorf("error in updateRecord: %v", err)
 		w.Write([]byte(err.Error()))
@@ -94,12 +80,12 @@ func updateDocument(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// find and unmarshal the document to a struct we can return
-	var updateData need
+	var n need
 	filter := bson.M{"_id": oid}
-	update := bson.M{"$set": bson.M{"isMet": n.IsMet}}
+	update := bson.M{"$set": bson.M{"isMet": isMet}}
 
 	log.Info(fmt.Sprintf("Updating record %v with isMet %v", n.ID, n.IsMet))
-	err = collection.FindOneAndUpdate(context.Background(), filter, update).Decode(&updateData)
+	err = collection.FindOneAndUpdate(context.Background(), filter, update).Decode(&n)
 	if err != nil {
 		log.Errorf("error in updateRecord: %v", err)
 		w.Write([]byte(err.Error()))
@@ -107,7 +93,7 @@ func updateDocument(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// marshal the struct to send over the wire
-	jsonData, err := json.Marshal(updateData)
+	jsonData, err := json.Marshal(n)
 	if err != nil {
 		log.Errorf("error in getRecord: %v", err)
 		w.Write([]byte(err.Error()))
@@ -115,6 +101,6 @@ func updateDocument(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// I'm just going to ignore this error and int
-	log.Infof("Found record: %+v", updateData)
+	log.Infof("Found record: %+v", n)
 	_, _ = w.Write(jsonData)
 }
