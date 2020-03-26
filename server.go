@@ -13,6 +13,7 @@ func startServer() {
 	// define the new router, define paths, and handlers on the router
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/get", getDocument)
+	router.HandleFunc("/getall", getAll)
 	router.HandleFunc("/update", updateDocument)
 
 	// create a new http server with a default timeout for incoming requests

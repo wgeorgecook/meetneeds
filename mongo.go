@@ -58,6 +58,48 @@ func getDocument(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write(jsonData)
 }
 
+// TODO: paginate this
+func getAll(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	collection := mongoClient.Database(cfg.Database).Collection(cfg.Collection)
+
+	// find and unmarshal the document to a struct we can return
+	var needs []need
+	cursor, err := collection.Find(ctx, bson.D{})
+	if err != nil {
+		log.Errorf("error in getRecord: %v", err)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	defer cursor.Close(ctx)
+	for cursor.Next(ctx) {
+		var result need
+		err := cursor.Decode(&result)
+		if err != nil {
+			w.Write([]byte(err.Error()))
+			return
+		}
+		needs = append(needs, result)
+	}
+	if err := cursor.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	// marshal the struct to send over the wire
+	jsonData, err := json.Marshal(needs)
+	if err != nil {
+		log.Errorf("error in getRecord: %v", err)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	// I'm just going to ignore this error and int
+	log.Infof("Found record: %+v", needs)
+	_, _ = w.Write(jsonData)
+}
+
 func updateDocument(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	collection := mongoClient.Database(cfg.Database).Collection(cfg.Collection)
