@@ -25,6 +25,8 @@ func initMongo(connectionURI string) *mongo.Client {
 }
 
 func getDocument(w http.ResponseWriter, r *http.Request) {
+	// CORS
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	defer r.Body.Close()
 	collection := mongoClient.Database(cfg.Database).Collection(cfg.Collection)
 
@@ -60,6 +62,8 @@ func getDocument(w http.ResponseWriter, r *http.Request) {
 
 // TODO: paginate this
 func getAll(w http.ResponseWriter, r *http.Request) {
+	// CORS
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	defer r.Body.Close()
 	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
 	collection := mongoClient.Database(cfg.Database).Collection(cfg.Collection)
@@ -101,6 +105,8 @@ func getAll(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateDocument(w http.ResponseWriter, r *http.Request) {
+	// CORS
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	defer r.Body.Close()
 	collection := mongoClient.Database(cfg.Database).Collection(cfg.Collection)
 
