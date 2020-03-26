@@ -41,15 +41,20 @@ func getDocument(w http.ResponseWriter, r *http.Request) {
 	err = collection.FindOne(context.Background(), filter).Decode(&data)
 	if err != nil {
 		log.Errorf("error in getRecord: %v", err)
+		w.Write([]byte(err.Error()))
+		return
 	}
 
 	// marshal the struct to send over the wire
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		log.Errorf("error in getRecord: %v", err)
+		w.Write([]byte(err.Error()))
+		return
 	}
 
 	// I'm just going to ignore this error and int
+	log.Infof("Found record: %+v", data)
 	_, _ = w.Write(jsonData)
 }
 
@@ -68,18 +73,24 @@ func updateDocument(w http.ResponseWriter, r *http.Request) {
 	resp, err := http.Get(fmt.Sprintf("http://127.0.0.1:%v?id=%v", cfg.Port, id))
 	if err != nil {
 		log.Errorf("error in updateRecord: %v", err)
+		w.Write([]byte(err.Error()))
+		return
 	}
 
 	// unmarshal the response into our need struct
 	respBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Errorf("error in updateRecord: %v", err)
+		w.Write([]byte(err.Error()))
+		return
 	}
 
 	var n need
 	err = json.Unmarshal(respBytes, &n)
 	if err != nil {
 		log.Errorf("error in updateRecord: %v", err)
+		w.Write([]byte(err.Error()))
+		return
 	}
 
 	// find and unmarshal the document to a struct we can return
@@ -91,14 +102,19 @@ func updateDocument(w http.ResponseWriter, r *http.Request) {
 	err = collection.FindOneAndUpdate(context.Background(), filter, update).Decode(&updateData)
 	if err != nil {
 		log.Errorf("error in updateRecord: %v", err)
+		w.Write([]byte(err.Error()))
+		return
 	}
 
 	// marshal the struct to send over the wire
 	jsonData, err := json.Marshal(updateData)
 	if err != nil {
 		log.Errorf("error in getRecord: %v", err)
+		w.Write([]byte(err.Error()))
+		return
 	}
 
 	// I'm just going to ignore this error and int
+	log.Infof("Found record: %+v", updateData)
 	_, _ = w.Write(jsonData)
 }
