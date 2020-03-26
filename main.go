@@ -20,11 +20,17 @@ type config struct {
 
 type need struct {
 	ID   string `json:"_id" bson:"_id"`
-	Name string `json:"name" bson:"name"`
+	NeedingUser user `json:"needingUser" bson:"needingUser"`
+	MeetingUser user `json:"meetingUser" bson:"meetingUser"`
 	Need string `json:"need" bson:"need"`
 	IsMet bool  `json:"isMet" bson:"isMet"`
 }
 
+type user struct {
+	Name string `json:"name" bson:"name"`
+	Phone string `json:"phone,omitempty" bson:"phone,omitempty"`
+	Email string `json:"email,omitempty" bson:"email,omitempty"`
+}
 
 var srv *http.Server
 var log *zap.SugaredLogger
