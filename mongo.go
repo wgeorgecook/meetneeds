@@ -24,6 +24,13 @@ func initMongo(connectionURI string) *mongo.Client {
 	return client
 }
 
+func createDocument(w http.ResponseWriter, r *http.Request) {
+	// CORS
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	w.Write([]byte("Thank you!"))
+}
+
 func getDocument(w http.ResponseWriter, r *http.Request) {
 	// CORS
 	w.Header().Set("Access-Control-Allow-Origin", "*")
