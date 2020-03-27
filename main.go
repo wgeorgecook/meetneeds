@@ -19,7 +19,7 @@ type config struct {
 }
 
 type need struct {
-	ID   string `json:"_id" bson:"_id"`
+	ID   string `json:"_id,omitempty" bson:"_id,omitempty"`
 	NeedingUser user `json:"needingUser" bson:"needingUser"`
 	MeetingUser user `json:"meetingUser" bson:"meetingUser"`
 	Need string `json:"need" bson:"need"`

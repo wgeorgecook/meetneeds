@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"time"
@@ -25,10 +26,35 @@ func initMongo(connectionURI string) *mongo.Client {
 }
 
 func createDocument(w http.ResponseWriter, r *http.Request) {
-	// CORS
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	log.Info("Incoming create request")
+	defer r.Body.Close()
 
-	w.Write([]byte("Thank you!"))
+	// unmarshal the incoming request body into our needs struct
+	bodyBytes, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Infof("error in createDocument: %v", err)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	var n need
+	err = json.Unmarshal(bodyBytes, &n)
+	if err != nil {
+		log.Infof("error in createDocument: %v", err)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	// add our need to the database
+	collection := mongoClient.Database(cfg.Database).Collection(cfg.Collection)
+	document, err := collection.InsertOne(context.Background(), n)
+	if err != nil {
+		log.Infof("error in createDocument: %v")
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	w.Write([]byte(fmt.Sprintf("document created: %+v", document)))
 }
 
 func getDocument(w http.ResponseWriter, r *http.Request) {
