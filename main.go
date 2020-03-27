@@ -21,7 +21,7 @@ type config struct {
 type need struct {
 	ID   string `json:"_id,omitempty" bson:"_id,omitempty"`
 	NeedingUser user `json:"needingUser" bson:"needingUser"`
-	MeetingUser user `json:"meetingUser" bson:"meetingUser"`
+	MeetingUser user `json:"meetingUser,omitempty" bson:"meetingUser,omitempty"`
 	Need string `json:"need" bson:"need"`
 	IsMet bool  `json:"isMet" bson:"isMet"`
 }
