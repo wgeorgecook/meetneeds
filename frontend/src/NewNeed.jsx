@@ -4,31 +4,27 @@ import { Button, Grid, TextField } from '@material-ui/core'
 
 const NewNeed = () => {
     // TODO: Validate entries
-    const [name, setName] = useState(null);
-    const [email, setEmail] = useState(null);
-    const [phone, setPhone] = useState(null);
-    const [need, setNeed] = useState(null)
+    const initialState = {
+        "name": "",
+        "email": "",
+        "phone": "",
+        "need": "",
+        "success": false,
+    };
+
+    const [{name, email, phone, need, success}, setState] = useState(initialState)
+
     const url = "https://cors-anywhere.herokuapp.com/https://meetneeds.herokuapp.com/create";
 
     const handleChange = (e, type) => {
         const data = e.target.value;
-        switch (type) {
-            case "name":
-                setName(data);
-                break;
-            case "email":
-                setEmail(data);
-                break;
-            case "phone":
-                setPhone(data);
-                break;
-            case "need":
-                setNeed(data);
-                break;
-            default:
-                break;
-        }
+        setState(prevState => ({...prevState, [type]: data}))
     };
+
+    const clearState = () => {
+        console.log()
+        setState({ ...initialState });
+      };
 
     const submitData = () => {
         if (!(name && need && (phone || email))) {
@@ -53,37 +49,49 @@ const NewNeed = () => {
                         }
                 }
             );
-            const data = await resp;
-            console.log(data);
+            const data = resp;
+
+            if (resp.status === 200) {
+                alert("Submission successful")
+                setState({"success": true})
+                clearState();
+            } else {
+                alert("Something went wrong, please try again")
+            }
+
+            console.log("Data received: ", data)
         }
 
         sendData();
     };
 
     return (
-        <Grid
-            container
-            direction="column"
-            justify="space-evenly"
-            alignItems="stretch"
-            spacing={4}
-        >
-            <Grid item>
-                <TextField id="outlined-basic" label="Name" variant="outlined" multiline onChange={(e) => handleChange(e, "name")}/>
+        <div>
+            <h3>Submit a new need</h3>
+            <Grid
+                container
+                direction="column"
+                justify="space-evenly"
+                alignItems="stretch"
+                spacing={4}
+            >
+                <Grid item>
+                    <TextField id="outlined-basic" label="Name" variant="outlined" value={name} multiline onChange={(e) => handleChange(e, "name")}/>
+                </Grid>
+                <Grid item>
+                    <TextField id="outlined-basic" label="Phone Number" variant="outlined" value={phone} multiline onChange={(e) => handleChange(e, "phone")}/>
+                </Grid>
+                <Grid item>
+                    <TextField id="outlined-basic" label="Email" variant="outlined" value={email} multiline onChange={(e) => handleChange(e, "email")}/>
+                </Grid>
+                <Grid item>
+                    <TextField id="outlined-basic" label="Need" variant="outlined" value={need} multiline onChange={(e) => handleChange(e, "need")}/>
+                </Grid>
+                <Grid item>
+                    <Button variant="contained" color="primary" onClick={submitData}>Send</Button>
+                </Grid>
             </Grid>
-            <Grid item>
-                <TextField id="outlined-basic" label="Phone Number" variant="outlined" multiline onChange={(e) => handleChange(e, "phone")}/>
-            </Grid>
-            <Grid item>
-                <TextField id="outlined-basic" label="Email" variant="outlined" multiline onChange={(e) => handleChange(e, "email")}/>
-            </Grid>
-            <Grid item>
-                <TextField id="outlined-basic" label="Need" variant="outlined" multiline onChange={(e) => handleChange(e, "need")}/>
-            </Grid>
-            <Grid item>
-                <Button variant="contained" color="primary" onClick={submitData}>Send</Button>
-            </Grid>
-        </Grid>
+        </div>
     )
 };
 export default NewNeed;
