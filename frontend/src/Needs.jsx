@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 
 const useFetch = url => {
-    const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [{ data, loading }, setState] = useState({
+        data: null,
+        loading: true,
+    })
 
 
     useEffect(() => {
-        fetch("https://meetneeds.herokuapp.com/getall")
+        fetch(url)
         .then(response => response.json())
-        .then(data => console.log(data))
-    }, []);
+        .then(data => setState({data: data, loading: false}))
+    }, [url]);
 
     return {data, loading};
 }
@@ -31,7 +33,7 @@ const Needs = () => {
             {[...data].map(n => (
                 (n.isMet) ? null :
                 <div key={n.id}>
-                    <p>Name: {n.name}</p>
+                    <p>Name: {n.needingUser.name}</p>
                     <p>Need: {n.need}</p>
                 </div>
             ))}
