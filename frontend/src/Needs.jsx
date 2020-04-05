@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Need from './Need'
 
 const useFetch = url => {
     const [{ data, loading }, setState] = useState({
@@ -31,11 +32,7 @@ const Needs = () => {
         <div>
             <h3>Needs Available to Meet</h3>
             {[...data].map(n => (
-                (n.isMet) ? null :
-                <div key={n.id}>
-                    <p>Name: {n.needingUser.name}</p>
-                    <p>Need: {n.need}</p>
-                </div>
+                (n.isMet) ? null : <Need key={n.id} {...n}/>
             ))}
         </div>
     )
