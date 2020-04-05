@@ -4,14 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func initMongo(connectionURI string) *mongo.Client {
@@ -100,6 +101,22 @@ func getAll(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
 	collection := mongoClient.Database(cfg.Database).Collection(cfg.Collection)
+
+	// Get the Page Number
+	var pageNumber int
+	var err error
+	if len(r.URL.Query()["pagenumber"]) > 0 {
+		pageNumber, err = strconv.Atoi(r.URL.Query()["pagenumber"][0])
+
+		if err != nil || pageNumber < 1 {
+			pageNumber = 1
+		}
+	} else {
+		pageNumber = 1
+	}
+
+	log.Infof("PageNumber: %v", pageNumber)
+	// Page number has been accepted - still need to return proper data: https://stackoverflow.com/questions/5525304/how-to-do-pagination-using-range-queries-in-mongodb
 
 	// find and unmarshal the document to a struct we can return
 	var needs []need
