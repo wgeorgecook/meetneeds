@@ -1,6 +1,7 @@
 import axios from 'axios'
 import React, { useState } from 'react';
 import { Button, Grid, TextField } from '@material-ui/core'
+import { toast } from 'react-toastify';
 
 const NewNeed = () => {
     // TODO: Validate entries
@@ -9,10 +10,9 @@ const NewNeed = () => {
         "email": "",
         "phone": "",
         "need": "",
-        "success": false,
     };
 
-    const [{name, email, phone, need, success}, setState] = useState(initialState)
+    const [{ name, email, phone, need }, setState] = useState(initialState)
 
     const url = "https://cors-anywhere.herokuapp.com/https://meetneeds.herokuapp.com/create";
 
@@ -25,6 +25,19 @@ const NewNeed = () => {
         console.log()
         setState({ ...initialState });
       };
+
+    const successfulPost = () => {
+        toast('Need successfully created', {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            });
+
+        clearState();
+    };
 
     const submitData = () => {
         if (!(name && need && (phone || email))) {
@@ -52,9 +65,7 @@ const NewNeed = () => {
             const data = resp;
 
             if (resp.status === 200) {
-                alert("Submission successful")
-                setState({"success": true})
-                clearState();
+                successfulPost();
             } else {
                 alert("Something went wrong, please try again")
             }
