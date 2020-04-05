@@ -4,14 +4,12 @@ const useFetch = url => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    async function fetchData() {
-        const resp = await fetch(url);
-        const data = await resp.json();
-        setData(data);
-        setLoading(false);
-    }
 
-    useEffect(() => {fetchData()}, [url]);
+    useEffect(() => {
+        fetch("https://meetneeds.herokuapp.com/getall")
+        .then(response => response.json())
+        .then(data => console.log(data))
+    }, []);
 
     return {data, loading};
 }
@@ -20,12 +18,16 @@ const Needs = () => {
     console.log(data);
     if(loading) {
         return(
-            <div>loading...</div>
+            <div>
+                <h3>Needs Available to Meet</h3>
+                <div>loading...</div>
+            </div>
         )
     }
 
     return (
         <div>
+            <h3>Needs Available to Meet</h3>
             {[...data].map(n => (
                 (n.isMet) ? null :
                 <div key={n.id}>
