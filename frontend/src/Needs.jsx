@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Need from './Need'
+import { Grid } from '@material-ui/core';
 
 const useFetch = url => {
     const [{ data, loading }, setState] = useState({
@@ -31,9 +32,13 @@ const Needs = () => {
     return (
         <div>
             <h3>Needs Available to Meet</h3>
-            {[...data].map(n => (
-                (n.isMet) ? null : <Need key={n.id} {...n}/>
-            ))}
+            <Grid container spacing={4}>
+                {[...data].map(n => (
+                        <Grid item>
+                            {(n.isMet) ? null : <Need key={n.id} {...n}/>}
+                        </Grid>
+                ))}
+            </Grid>
         </div>
     )
 };
