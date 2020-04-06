@@ -60,7 +60,7 @@ const Needs = () => {
             </Grid>
             {(!state.newNeedOpen)
                 ? <Button onClick={() => dispatch({type:"open"})} > Submit a new need </Button>
-                : <NewNeed closeNeed={closeNeed}/>
+                : <NewNeed closeNeed={closeNeed}/> // TODO: This should be a modal
             }
         </div>
     )
