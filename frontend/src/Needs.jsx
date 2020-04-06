@@ -1,7 +1,7 @@
 import React, { useReducer, useState, useEffect } from 'react';
 import Need from './Need'
 import NewNeed from './NewNeed'
-import { Grid, IconButton } from '@material-ui/core';
+import { Grid, IconButton, Dialog, DialogContent, DialogContentText } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 
 const useFetch = url => {
@@ -61,7 +61,17 @@ const Needs = () => {
             </Grid>
             {(!state.newNeedOpen)
                 ? <IconButton onClick={() => dispatch({type:"open"})} > <AddIcon />Submit a new need </IconButton>
-                : <NewNeed closeNeed={closeNeed}/> // TODO: This should be a modal
+                : <Dialog open={state.newNeedOpen} onClose={closeNeed} aria-labelledby="form-dialog-title" >
+                    <DialogContent>
+                        <DialogContentText>
+                            Plase use this form to submit a new need.
+                        </DialogContentText>
+                        <NewNeed closeNeed={closeNeed}/>
+                        <DialogContentText>
+                            Refer to our Privacy Policy for privacy details.
+                        </DialogContentText>
+                    </DialogContent>
+                  </Dialog>
             }
         </div>
     )
