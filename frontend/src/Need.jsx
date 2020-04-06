@@ -24,7 +24,7 @@ const Need = props => {
                     </Typography>
                 </CardContent>
                 <CardActions>
-                    {// TODO: this needs to open a modal to collect data}
+                    {/* TODO: this needs to open a modal to collect data */}
                     <Button size="small">I can fulfill this need</Button>
                 </CardActions>
                 </Card>
