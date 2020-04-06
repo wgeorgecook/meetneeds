@@ -3,8 +3,10 @@ import React, { useState } from 'react';
 import { Button, Grid, TextField } from '@material-ui/core'
 import { toast } from 'react-toastify';
 
-const NewNeed = () => {
-    // TODO: Validate entries
+const NewNeed = props => {
+
+    const { closeNeed } = props;
+
     const initialState = {
         "name": "",
         "email": "",
@@ -22,7 +24,6 @@ const NewNeed = () => {
     };
 
     const clearState = () => {
-        console.log()
         setState({ ...initialState });
       };
 
@@ -37,8 +38,10 @@ const NewNeed = () => {
             });
 
         clearState();
+        closeNeed();
     };
 
+    // TODO: Validate entries
     const submitData = () => {
         if (!(name && need && (phone || email))) {
             alert("Please enter your name, your need, and at least one way we can contact you.")
