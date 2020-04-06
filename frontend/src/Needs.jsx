@@ -33,6 +33,7 @@ const newNeedReducer = (state, action) => {
 
 
 const Needs = () => {
+    // TODO: this needs to re-render when a user accepts a need to fulfil
     const {data, loading} = useFetch("https://meetneeds.herokuapp.com/getall?pagenumber=1");
     const [ state, dispatch ] = useReducer(newNeedReducer, {newNeedOpen: false})
 
