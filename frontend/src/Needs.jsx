@@ -1,7 +1,8 @@
 import React, { useReducer, useState, useEffect } from 'react';
 import Need from './Need'
 import NewNeed from './NewNeed'
-import { Button, Grid } from '@material-ui/core';
+import { Grid, IconButton } from '@material-ui/core';
+import AddIcon from '@material-ui/icons/Add';
 
 const useFetch = url => {
     const [{ data, loading }, setState] = useState({
@@ -59,7 +60,7 @@ const Needs = () => {
                 ))}
             </Grid>
             {(!state.newNeedOpen)
-                ? <Button onClick={() => dispatch({type:"open"})} > Submit a new need </Button>
+                ? <IconButton onClick={() => dispatch({type:"open"})} > <AddIcon />Submit a new need </IconButton>
                 : <NewNeed closeNeed={closeNeed}/> // TODO: This should be a modal
             }
         </div>
