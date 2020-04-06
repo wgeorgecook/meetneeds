@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Card, CardActions, CardContent, Typography } from '@material-ui/core'
+import { Button, Card, CardActions, CardContent, Dialog, DialogContent, DialogContentText, Typography } from '@material-ui/core'
+import MeetNeed from './MeetNeed'
 
 const Need = props => {
 
-    const [need, setNeed] = useState(props);
+    const [n, setNeed] = useState(props);
+    const [meetOpen, setMeetOpen] = useState({meetOpen: false})
 
     useEffect(() => {
         setNeed(props);
@@ -17,15 +19,24 @@ const Need = props => {
                     Community Need
                     </Typography>
                     <Typography >
-                        Name: {need.needingUser.name}
+                        Name: {n.needingUser.name}
                     </Typography>
                     <Typography color="textSecondary">
-                        Need: {need.need}
+                        Need: {n.need}
                     </Typography>
                 </CardContent>
                 <CardActions>
-                    {/* TODO: this needs to open a modal to collect data */}
-                    <Button size="small">I can fulfill this need</Button>
+                    { (!meetOpen.meetOpen)
+                      ? <Button size="small" onClick={() => setMeetOpen({meetOpen: true})}>I can fulfill this need</Button>
+                      : <Dialog open={meetOpen.meetOpen} onClose={() => setMeetOpen({meetOpen: false})} aria-labelledby="form-dialog-title" >
+                            <DialogContent>
+                                <DialogContentText>
+                                    Thank you for volunteering to meet this need! Please complete this form and we will be in touch soon.
+                                </DialogContentText>
+                                <MeetNeed closeNeed={() => setMeetOpen({meetOpen: false})} {...n}/>
+                            </DialogContent>
+                        </Dialog>
+                    }
                 </CardActions>
                 </Card>
         </div>

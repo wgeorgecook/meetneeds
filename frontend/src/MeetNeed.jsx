@@ -3,20 +3,22 @@ import React, { useState } from 'react';
 import { Button, Grid, TextField } from '@material-ui/core'
 import { toast } from 'react-toastify';
 
-const NewNeed = props => {
+const MeetNeed = props => {
 
-    const { closeNeed } = props;
+    const { closeNeed, _id } = props;
+    console.log(props)
 
     const initialState = {
         "name": "",
         "email": "",
         "phone": "",
         "need": "",
+        "id": _id
     };
 
-    const [{ name, email, phone, need }, setState] = useState(initialState)
+    const [{ name, email, phone, id }, setState] = useState(initialState)
 
-    const url = "https://cors-anywhere.herokuapp.com/https://meetneeds.herokuapp.com/create";
+    const url = `https://cors-anywhere.herokuapp.com/https://meetneeds.herokuapp.com/update?id=${id}&isMet=true`;
 
     const handleChange = (e, type) => {
         const data = e.target.value;
@@ -28,7 +30,7 @@ const NewNeed = props => {
       };
 
     const successfulPost = () => {
-        toast('Need successfully created', {
+        toast('From successfully sent!', {
             position: "top-right",
             autoClose: 5000,
             hideProgressBar: false,
@@ -43,8 +45,8 @@ const NewNeed = props => {
 
     // TODO: Validate entries
     const submitData = () => {
-        if (!(name && need && (phone || email))) {
-            alert("Please enter your name, your need, and at least one way we can contact you.")
+        if (!(name && (phone || email))) {
+            alert("Please enter your name and at least one way we can contact you.")
             return;
         }
 
@@ -52,12 +54,11 @@ const NewNeed = props => {
             const resp = await axios.post(
                 url,
                 {
-                    "needingUser": {
+                    "meetingUser": {
                         "name": name,
                         "email": email,
                         "phone": phone,
                     },
-                    need
                 },
                 { "headers":
                         {
@@ -98,13 +99,10 @@ const NewNeed = props => {
                     <TextField id="outlined-basic" label="Email" variant="outlined" value={email} multiline onChange={(e) => handleChange(e, "email")}/>
                 </Grid>
                 <Grid item>
-                    <TextField id="outlined-basic" label="Need" variant="outlined" value={need} multiline onChange={(e) => handleChange(e, "need")}/>
-                </Grid>
-                <Grid item>
-                    <Button variant="contained" color="primary" onClick={submitData}>Submit Need</Button>
+                    <Button variant="contained" color="primary" onClick={submitData}>Submit Form</Button>
                 </Grid>
             </Grid>
         </div>
     )
 };
-export default NewNeed;
+export default MeetNeed;

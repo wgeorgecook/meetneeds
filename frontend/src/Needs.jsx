@@ -33,7 +33,7 @@ const newNeedReducer = (state, action) => {
 
 
 const Needs = () => {
-    const {data, loading} = useFetch("https://meetneeds.herokuapp.com/getall");
+    const {data, loading} = useFetch("https://meetneeds.herokuapp.com/getall?pagenumber=1");
     const [ state, dispatch ] = useReducer(newNeedReducer, {newNeedOpen: false})
 
     const closeNeed = () => {
