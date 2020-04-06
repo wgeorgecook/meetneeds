@@ -180,6 +180,7 @@ func updateDocument(w http.ResponseWriter, r *http.Request) {
 	// find and unmarshal the document to a struct we can return
 	var n need
 	filter := bson.M{"_id": oid}
+	// TODO: get the meetingUser off the request body and update the document with the data
 	update := bson.M{"$set": bson.M{"isMet": isMet}}
 
 	log.Info(fmt.Sprintf("Updating record %v with isMet %v", n.ID, n.IsMet))
