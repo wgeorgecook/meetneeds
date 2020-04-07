@@ -89,6 +89,10 @@ const MeetNeed = props => {
                 alignItems="stretch"
                 spacing={4}
             >
+                <Grid item style={{"color": "darkgrey"}}>
+                    <p>Thank you for volunteering to meet this need!</p>
+                    <p>Please complete this form and we will be in touch soon.</p>
+                </Grid>
                 <Grid item>
                     <TextField id="outlined-basic" label="Name" variant="outlined" value={name} multiline onChange={(e) => handleChange(e, "name")}/>
                 </Grid>
