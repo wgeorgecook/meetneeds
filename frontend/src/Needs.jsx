@@ -1,8 +1,6 @@
-import React, { useReducer, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Need from './Need'
-import NewNeed from './NewNeed'
-import { Grid, IconButton, Dialog, DialogContent, DialogContentText } from '@material-ui/core';
-import AddIcon from '@material-ui/icons/Add';
+import { Grid } from '@material-ui/core';
 
 const useFetch = (url) => {
     const [{ data, loading }, setState] = useState({
@@ -20,26 +18,10 @@ const useFetch = (url) => {
     return {data, loading};
 };
 
-const newNeedReducer = (state, action) => {
-    switch (action.type) {
-        case "open":
-            return {newNeedOpen: true};
-        case "close":
-            return {newNeedOpen: false};
-        default:
-            return state.newNeedOpen;
-    }
-};
-
 
 const Needs = () => {
     // TODO: this needs to re-render when a user accepts a need to fulfil
     const { data, loading } = useFetch("https://meetneeds.herokuapp.com/getall?pagenumber=1");
-    const [ state, dispatch ] = useReducer(newNeedReducer, {newNeedOpen: false});
-
-    const closeNeed = () => {
-        dispatch({newNeedOpen: false})
-    };
 
     return (
         <div>
@@ -54,21 +36,6 @@ const Needs = () => {
                                 </Grid>
                         ))}
                     </Grid>
-            }
-            {
-                !state.newNeedOpen
-                    ? <IconButton onClick={() => dispatch({type:"open"})} > <AddIcon />Submit a new need </IconButton>
-                    : <Dialog open={state.newNeedOpen} onClose={closeNeed} aria-labelledby="form-dialog-title" >
-                        <DialogContent>
-                            <DialogContentText>
-                                Plase use this form to submit a new need.
-                            </DialogContentText>
-                            <NewNeed closeNeed={closeNeed}/>
-                            <DialogContentText>
-                                Refer to our Privacy Policy for privacy details.
-                            </DialogContentText>
-                        </DialogContent>
-                    </Dialog>
             }
         </div>
     )
