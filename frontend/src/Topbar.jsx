@@ -1,7 +1,6 @@
 import React, { useReducer } from 'react'
 import NewNeed from './NewNeed'
-import { AppBar, Button, Dialog, DialogContent, DialogContentText, Toolbar, Typography } from '@material-ui/core'
-import AddIcon from '@material-ui/icons/Add';
+import { Button, Divider, Modal, PageHeader } from 'antd';
 
 const newNeedReducer = (state, action) => {
     switch (action.type) {
@@ -24,28 +23,18 @@ const Topbar = () => {
 
 
     return(
-        <AppBar position="static">
-        <Toolbar>
-            <Typography variant="h6">
-            Meet Needs - Connecting Your Community
-            </Typography>
-            { !state.newNeedOpen
-                    ? <Button variant="text" onClick={() => dispatch({type:"open"})} > <AddIcon color="inherit"/>New need </Button>
-                    : <Dialog open={state.newNeedOpen} onClose={closeNeed} aria-labelledby="form-dialog-title" >
-                        <DialogContent>
-                            <DialogContentText>
-                                Plase use this form to submit a new need.
-                            </DialogContentText>
-                            <NewNeed closeNeed={closeNeed}/>
-                            <DialogContentText>
-                                Refer to our Privacy Policy for privacy details.
-                            </DialogContentText>
-                        </DialogContent>
-                    </Dialog>
-            }
-
-        </Toolbar>
-        </AppBar>
+        <PageHeader
+            title="Meet Needs"
+            subTitle="Connecting Your Community"
+            extra={<Button type="primary" onClick={() => dispatch({type:"open"})}> New need </Button>}
+            >
+            <Modal visible={state.newNeedOpen} onCancel={closeNeed} onOk={closeNeed} >
+                <p>Plase use this form to submit a new need.</p>
+                <NewNeed closeNeed={closeNeed}/>
+                <p>Refer to our Privacy Policy for privacy details.</p>
+            </Modal>
+            <Divider />
+        </PageHeader>
     )
 };
 
