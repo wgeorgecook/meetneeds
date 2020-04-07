@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Card, Form, Input, Modal } from 'antd';
+import { Button, Card, Form, Modal } from 'antd';
 import { toast } from 'react-toastify';
 import axios from 'axios'
+import MeetNeed from './MeetNeed';
 
 const Need = props => {
 
@@ -86,31 +87,7 @@ const Need = props => {
                             }}
                             okText="Submit"
                         >
-                            <p>Thank you for volunteering to meet this need! </p>
-                            <p>Please complete this form and we will be in touch soon.</p>
-                            <Form name="Meet A Need" form={form}>
-                                <Form.Item
-                                    name={"name"}
-                                    label='Name'
-                                    rules={[{ required: true }]}
-                                >
-                                        <Input />
-                                </Form.Item>
-                                <Form.Item
-                                    name={"phone"}
-                                    label='Phone'
-                                    rules={[{ required: false }]}
-                                >
-                                        <Input />
-                                </Form.Item>
-                                <Form.Item
-                                    name="email"
-                                    label="E-mail"
-                                    rules={[{type: 'email', message: 'The input is not valid E-mail!'}]}
-                                >
-                                    <Input />
-                                </Form.Item>
-                            </Form>
+                           <MeetNeed form={form} />
                         </Modal>
                     }
             </Card>
