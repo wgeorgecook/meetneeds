@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Need from './Need'
-import { Grid } from '@material-ui/core';
+import { Row, Col } from 'antd';
 
 const useFetch = (url) => {
     const [{ data, loading }, setState] = useState({
@@ -25,17 +25,16 @@ const Needs = () => {
 
     return (
         <div>
-            <h3>Needs Available to Meet</h3>
             {
-                loading
+                (loading)
                 ?  <div>loading...</div>
-                :  <Grid container spacing={4}>
+                :  <Row gutter={[16, 16]}>
                         {[...data].map(n => (
-                                <Grid item key={n._id}>
+                                <Col item key={n._id}>
                                     {(n.isMet) ? null : <Need {...n}/>}
-                                </Grid>
+                                </Col>
                         ))}
-                    </Grid>
+                    </Row>
             }
         </div>
     )
