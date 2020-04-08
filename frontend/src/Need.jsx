@@ -25,11 +25,10 @@ const Need = props => {
 
     };
 
-        // TODO: Validate entries
         const submitData = (values) => {
             console.log(values);
-            if (!(values.name && (values.phone || values.email))) {
-                alert("Please enter your name and at least one way we can contact you.")
+            if (!(values.name && values.rationale && (values.phone || values.email))) {
+                alert("Please enter your name, how you plan to provide for this need, and at least one way we can contact you.")
                 return;
             }
 
@@ -41,6 +40,7 @@ const Need = props => {
                             "name": values.name,
                             "email": values.email,
                             "phone": values.phone,
+                            "rationale": values.rationale,
                         },
                     },
                     { "headers":
@@ -69,27 +69,24 @@ const Need = props => {
 
     return (
         <div>
-            <Card title="Community Need">
-                <p>Name: {n.needingUser.name}</p>
-                <p>Need: {n.need}</p>
-                    { (!meetOpen.meetOpen)
-                      ? <Button size="small" onClick={() => setMeetOpen({meetOpen: true})}>I can meet this need</Button>
-                      : <Modal
-                            visible={meetOpen.meetOpen}
-                            onCancel={() => setMeetOpen({meetOpen: false})}
-                            onOk={() => {
-                                form
-                                  .validateFields()
-                                  .then(values => {
-                                    form.resetFields();
-                                    submitData(values);
-                                  })
-                            }}
-                            okText="Submit"
-                        >
-                           <MeetNeed form={form} />
-                        </Modal>
-                    }
+            <Card title={`${n.needingUser.name} needs`}>
+                <p>{n.need}</p>
+                <Button size="small" onClick={() => setMeetOpen({meetOpen: true})}>I can meet this need</Button>
+                <Modal
+                    visible={meetOpen.meetOpen}
+                    onCancel={() => setMeetOpen({meetOpen: false})}
+                    onOk={() => {
+                        form
+                            .validateFields()
+                            .then(values => {
+                            form.resetFields();
+                            submitData(values);
+                            })
+                    }}
+                    okText="Submit"
+                >
+                    <MeetNeed form={form} />
+                </Modal>
             </Card>
         </div>
     )

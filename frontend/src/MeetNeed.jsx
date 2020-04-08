@@ -30,6 +30,13 @@ const MeetNeed = (props) => {
             >
                 <Input />
             </Form.Item>
+            <Form.Item
+                name="rationale"
+                label="Please let us know how you'll meet this need"
+                rules={[{required: true}]}
+            >
+                <Input />
+            </Form.Item>
         </Form>
     )
 };

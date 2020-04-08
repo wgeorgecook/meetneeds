@@ -30,6 +30,7 @@ type user struct {
 	Name string `json:"name" bson:"name"`
 	Phone string `json:"phone,omitempty" bson:"phone,omitempty"`
 	Email string `json:"email,omitempty" bson:"email,omitempty"`
+	Rationale string `json:"rationale,omitempty" bson:"rationale,omitempty"`
 }
 
 var srv *http.Server
