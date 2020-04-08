@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Topbar from './Topbar'
 import Need from './Need'
 import { Row, Col } from 'antd';
 
@@ -13,7 +14,7 @@ const useFetch = (url) => {
         fetch(url)
         .then(response => response.json())
         .then(data => setState({data: data, loading: false}))
-    }, [url]);
+    });
 
     return {data, loading};
 };
@@ -25,6 +26,7 @@ const Needs = () => {
 
     return (
         <div>
+            <Topbar />
             {
                 (loading)
                 ?  <div>loading...</div>
