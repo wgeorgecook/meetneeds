@@ -155,20 +155,11 @@ func getAll(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateDocument(w http.ResponseWriter, r *http.Request) {
-	// CORS
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 	defer r.Body.Close()
 	collection := mongoClient.Database(cfg.Database).Collection(cfg.Collection)
 
 	id := r.URL.Query()["id"][0]
-	isMetString := r.URL.Query()["isMet"][0]
 
-	isMet, err := strconv.ParseBool(isMetString)
-	if err != nil {
-		log.Errorf("error in updateRecord: %v", err)
-		w.Write([]byte(err.Error()))
-		return
-	}
 	// create an OID bson primitive based on the ID that comes in on the request
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -177,29 +168,33 @@ func updateDocument(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// find and unmarshal the document to a struct we can return
+
+	// unmarshal the incoming body into our user struct
 	var n need
 	filter := bson.M{"_id": oid}
-	// TODO: get the meetingUser off the request body and update the document with the data
-	update := bson.M{"$set": bson.M{"isMet": isMet}}
 
-	log.Info(fmt.Sprintf("Updating record %v with isMet %v", n.ID, n.IsMet))
-	err = collection.FindOneAndUpdate(context.Background(), filter, update).Decode(&n)
+	bodyBytes, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Errorf("error in updateRecord: %v", err)
 		w.Write([]byte(err.Error()))
 		return
 	}
 
-	// marshal the struct to send over the wire
-	jsonData, err := json.Marshal(n)
-	if err != nil {
-		log.Errorf("error in getRecord: %v", err)
+	if err = json.Unmarshal(bodyBytes, &n); err != nil {
+		log.Errorf("error in updateRecord: %v", err)
 		w.Write([]byte(err.Error()))
 		return
 	}
 
+	log.Infof("Will update with this: %+v", n)
+	update := bson.M{"$set": bson.M{"isMet": true, "meetingUser": n.MeetingUser}}
+
+	log.Info(fmt.Sprintf("Updating record %v with %+v", n.ID, update))
+	// find and update the document in Mongo
+	returned := collection.FindOneAndUpdate(context.Background(), filter, update)
+
 	// I'm just going to ignore this error and int
-	log.Infof("Found record: %+v", n)
-	_, _ = w.Write(jsonData)
+	log.Infof("Found record: %+v", returned)
+	w.WriteHeader(200)
+	_, _ = w.Write([]byte("ok"))
 }
