@@ -40,7 +40,7 @@ const Topbar = () => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 mode: 'no-cors',
-                body: JSON.stringify(                {
+                body: JSON.stringify({
                     "needingUser": {
                         "name": formData.name,
                         "email": formData.email,

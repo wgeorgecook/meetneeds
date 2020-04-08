@@ -34,7 +34,7 @@ const Needs = () => {
                 :  <Row gutter={[16, 16]}>
                         {[...data].map(n => (
                                 <Col key={n._id}>
-                                    {(n.isMet) ? null : <Need {...n}/>}
+                                    {<Need {...n}/>}
                                 </Col>
                         ))}
                     </Row>

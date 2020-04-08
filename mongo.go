@@ -81,6 +81,11 @@ func getDocument(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// filter out sensitive contact info from the network request
+	data.NeedingUser.Phone = ""
+	data.NeedingUser.Email = ""
+	data.MeetingUser = user{}
+
 	// marshal the struct to send over the wire
 	jsonData, err := json.Marshal(data)
 	if err != nil {
@@ -120,7 +125,7 @@ func getAll(w http.ResponseWriter, r *http.Request) {
 
 	// find and unmarshal the document to a struct we can return
 	var needs []need
-	cursor, err := collection.Find(ctx, bson.D{})
+	cursor, err := collection.Find(ctx, bson.M{"isMet": false})
 	if err != nil {
 		log.Errorf("error in getRecord: %v", err)
 		w.Write([]byte(err.Error()))
@@ -135,6 +140,10 @@ func getAll(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte(err.Error()))
 			return
 		}
+		// filter out senstive info on network request
+		result.NeedingUser.Phone = ""
+		result.NeedingUser.Email = ""
+		result.MeetingUser = user{}
 		needs = append(needs, result)
 	}
 	if err := cursor.Err(); err != nil {

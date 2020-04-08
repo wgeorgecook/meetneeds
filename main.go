@@ -27,7 +27,7 @@ type need struct {
 }
 
 type user struct {
-	Name string `json:"name" bson:"name"`
+	Name string `json:"name,omitempty" bson:"name,omitempty"`
 	Phone string `json:"phone,omitempty" bson:"phone,omitempty"`
 	Email string `json:"email,omitempty" bson:"email,omitempty"`
 	Rationale string `json:"rationale,omitempty" bson:"rationale,omitempty"`
