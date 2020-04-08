@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Topbar from './Topbar'
 import Need from './Need'
+import urls from './urls'
 import { Row, Col } from 'antd';
 
 const useFetch = (url) => {
@@ -14,7 +15,7 @@ const useFetch = (url) => {
         fetch(url)
         .then(response => response.json())
         .then(data => setState({data: data, loading: false}))
-    });
+    }, [url]);
 
     return {data, loading};
 };
@@ -22,7 +23,7 @@ const useFetch = (url) => {
 
 const Needs = () => {
     // TODO: this needs to re-render when a user accepts a need to fulfil
-    const { data, loading } = useFetch("https://meetneeds.herokuapp.com/getall?pagenumber=1");
+    const { data, loading } = useFetch(`${urls.GET_URL}?pagenumber=1`);
 
     return (
         <div>
@@ -32,7 +33,7 @@ const Needs = () => {
                 ?  <div>loading...</div>
                 :  <Row gutter={[16, 16]}>
                         {[...data].map(n => (
-                                <Col item key={n._id}>
+                                <Col key={n._id}>
                                     {(n.isMet) ? null : <Need {...n}/>}
                                 </Col>
                         ))}

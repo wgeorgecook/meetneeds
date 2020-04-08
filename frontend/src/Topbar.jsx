@@ -1,7 +1,6 @@
-import React, { useReducer } from 'react'
-import axios from 'axios'
-import { toast } from 'react-toastify'
-import NewNeed from './NewNeed'
+import React, { useReducer } from 'react';
+import NewNeed from './NewNeed';
+import urls from './urls';
 import { Button, Divider, Form, Modal, PageHeader } from 'antd';
 
 const newNeedReducer = (state, action) => {
@@ -19,21 +18,13 @@ const newNeedReducer = (state, action) => {
 const Topbar = () => {
     const [ state, dispatch ] = useReducer(newNeedReducer, {newNeedOpen: false});
     const [form] = Form.useForm();
-    const url = "https://cors-anywhere.herokuapp.com/https://meetneeds.herokuapp.com/create";
+    const url = urls.CREATE_URL;
     const closeNeed = () => {
         dispatch({newNeedOpen: false})
     };
 
-    const successfulPost = () => {
-        toast('Need successfully created', {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            });
-
+    const onSuccess = (data) => {
+        console.log(data);
         closeNeed();
     };
 
@@ -45,32 +36,24 @@ const Topbar = () => {
         }
 
         async function sendData() {
-            const resp = await axios.post(
-                url,
-                {
+            const requestOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                mode: 'no-cors',
+                body: JSON.stringify(                {
                     "needingUser": {
                         "name": formData.name,
                         "email": formData.email,
                         "phone": formData.phone,
                     },
                     "need": formData.need,
-                },
-                { "headers":
-                        {
-                            'Content-Type': 'application/json',
-                        }
-                }
-            );
-            const data = resp;
-
-            if (resp.status === 200) {
-                successfulPost();
-            } else {
-                alert("Something went wrong, please try again")
-            }
-
-            console.log("Data received: ", data)
-        }
+                })
+            };
+            fetch(url, requestOptions)
+            .then(resp => resp)
+            .then(data => onSuccess(data))
+            .catch(err => alert(`Something went wrong: ${err}`));
+        };
 
         sendData();
     };
