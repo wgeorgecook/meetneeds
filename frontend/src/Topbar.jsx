@@ -28,7 +28,7 @@ const Topbar = () => {
         closeNeed();
     };
 
-    // TODO: Validate entries
+    // TODO: Validate phone entries
     const submitData = (formData) => {
         if (!(formData.name && formData.need && (formData.phone || formData.email))) {
             alert("Please enter your name, your need, and at least one way we can contact you.")
