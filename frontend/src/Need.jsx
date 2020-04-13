@@ -15,7 +15,7 @@ const Need = props => {
         setMeetOpen({meetOpen: false});
     }
 
-    const submitData = (values) => {
+    const submitData = (values, cb) => {
         console.log(values);
         if (!(values.name && values.rationale && (values.phone || values.email))) {
             alert("Please enter your name, how you plan to provide for this need, and at least one way we can contact you.")
@@ -43,6 +43,7 @@ const Need = props => {
         }
 
         sendData();
+        props.onMetNeed();
     };
 
     useEffect(() => {

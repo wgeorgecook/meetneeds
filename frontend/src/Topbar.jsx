@@ -15,7 +15,7 @@ const newNeedReducer = (state, action) => {
 };
 
 
-const Topbar = () => {
+const Topbar = (props) => {
     const [ state, dispatch ] = useReducer(newNeedReducer, {newNeedOpen: false});
     const [form] = Form.useForm();
     const url = urls.CREATE_URL;
@@ -56,6 +56,7 @@ const Topbar = () => {
         };
 
         sendData();
+        props.onNewNeed();
     };
 
 

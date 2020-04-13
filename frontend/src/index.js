@@ -5,6 +5,7 @@ import * as serviceWorker from './serviceWorker';
 import App from './App';
 
 ReactDOM.render(
+  // TODO: Antd throws some strict mode errors. Investigate whether to disable this or not.
   <React.StrictMode>
     <App />
   </React.StrictMode>,
