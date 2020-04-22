@@ -31,6 +31,7 @@ type user struct {
 	Phone string `json:"phone,omitempty" bson:"phone,omitempty"`
 	Email string `json:"email,omitempty" bson:"email,omitempty"`
 	Rationale string `json:"rationale,omitempty" bson:"rationale,omitempty"`
+	Anonymous bool `json:"anon,omitempty" bson:"anon,omitempty"`
 }
 
 var srv *http.Server

@@ -143,6 +143,9 @@ func getAll(w http.ResponseWriter, r *http.Request) {
 		// filter out senstive info on network request
 		result.NeedingUser.Phone = ""
 		result.NeedingUser.Email = ""
+		if result.NeedingUser.Anonymous {
+			result.NeedingUser.Name = "Anonymous"
+		}
 		result.MeetingUser = user{}
 		needs = append(needs, result)
 	}
