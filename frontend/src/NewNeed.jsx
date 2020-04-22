@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Input } from 'antd'
+import { Checkbox, Form, Input } from 'antd'
 
 const NewNeed = (props) => {
     const { form } = props;
@@ -34,6 +34,9 @@ const NewNeed = (props) => {
                 rules={[{required: true}]}
             >
                 <Input />
+            </Form.Item>
+            <Form.Item name="anonymous" valuePropName="checked">
+                <Checkbox>I wish to remain anonymous when my need is displayed publicly</Checkbox>
             </Form.Item>
         </Form>
     )

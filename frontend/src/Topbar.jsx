@@ -30,6 +30,8 @@ const Topbar = (props) => {
 
     // TODO: Validate phone entries
     const submitData = (formData) => {
+        console.log("Received this form data: ")
+        console.log(formData)
         if (!(formData.name && formData.need && (formData.phone || formData.email))) {
             alert("Please enter your name, your need, and at least one way we can contact you.")
             return;
@@ -45,6 +47,7 @@ const Topbar = (props) => {
                         "name": formData.name,
                         "email": formData.email,
                         "phone": formData.phone,
+                        "anon": formData.anonymous
                     },
                     "need": formData.need,
                 })
