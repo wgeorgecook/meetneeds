@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{.MeetingUser.Name}} volunteered to meet {{.NeedingUser.Name}}'s need!</title>
+</head>
+<body>
+    <h3 style="width: 100%; align-content: center;">Exciting news!</h3>
+    <p style="width: 70%; align-content: center;">
+        {{.MeetingUser.Name}} volunteered to meet {{.NeedingUser.Name}}'s need!
+    </p>
+    <p>
+        Below you will find the contact information of both the Needer and the Meeter. Be sure to check the rationale
+        from the Meeter and try to determine if they are actually willing and able to meet this need. Consider the
+        safety of the Needer, and be sure to only share Meeter information with the Needer.
+    </p>
+    <div style="align-content: center">
+        Meeter:
+        <ul>
+            <li>Name: {{.MeetingUser.Name}}</li>
+            <li>Phone: {{.MeetingUser.Phone}}</li>
+            <li>Email: {{.MeetingUser.Email}}</li>
+            <li>Rationale: {{.MeetingUser.Rationale}}</li>
+        </ul>
+        Needer:
+        <ul>
+            <li>Name: {{.NeedingUser.Name}}</li>
+            <li>Phone: {{.NeedingUser.Phone}}</li>
+            <li>Email: {{.NeedingUser.Email}}</li>
+        </ul>
+    </div>
+</body>
+</html>

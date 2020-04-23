@@ -15,6 +15,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+// initMongo accepts a connectionURI string and returns a Mongo client for use in the global program.
 func initMongo(connectionURI string) *mongo.Client {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(connectionURI))
@@ -26,6 +27,7 @@ func initMongo(connectionURI string) *mongo.Client {
 	return client
 }
 
+// createDocument inserts a new need into our database once a needing user fills out the new need form and submits it
 func createDocument(w http.ResponseWriter, r *http.Request) {
 	log.Info("Incoming create request")
 	defer r.Body.Close()
@@ -58,6 +60,8 @@ func createDocument(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(fmt.Sprintf("document created: %+v", document)))
 }
 
+// getDocument expects an id as a query param on an incoming request. It will search the DB for that _id and return
+// the document that it finds (if any).
 func getDocument(w http.ResponseWriter, r *http.Request) {
 	// CORS
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -81,11 +85,6 @@ func getDocument(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// filter out sensitive contact info from the network request
-	data.NeedingUser.Phone = ""
-	data.NeedingUser.Email = ""
-	data.MeetingUser = user{}
-
 	// marshal the struct to send over the wire
 	jsonData, err := json.Marshal(data)
 	if err != nil {
@@ -100,6 +99,9 @@ func getDocument(w http.ResponseWriter, r *http.Request) {
 }
 
 // TODO: paginate this
+// getAll returns literally every record in the database, after filtering out any contact information and making sure
+// users who wish to be anonymous are respected with regard to the front end. This way, the front end never actually
+// receives any sensitive information. Nonetheless, it needs to be paginated.
 func getAll(w http.ResponseWriter, r *http.Request) {
 	// CORS
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -166,6 +168,9 @@ func getAll(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write(jsonData)
 }
 
+// updateDocument is called when a meeting user completes the meet a need form and submits it. It expects an id as a
+// query param on the request and looks up the corresponding document in Mongo. It builds an update filter and will
+// apply that update with the meeting user's details and sets the isMet field on this need to true.
 func updateDocument(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	collection := mongoClient.Database(cfg.Database).Collection(cfg.Collection)
@@ -202,11 +207,13 @@ func updateDocument(w http.ResponseWriter, r *http.Request) {
 	update := bson.M{"$set": bson.M{"isMet": true, "meetingUser": n.MeetingUser}}
 
 	log.Info(fmt.Sprintf("Updating record %v with %+v", n.ID, update))
-	// find and update the document in Mongo
-	returned := collection.FindOneAndUpdate(context.Background(), filter, update)
+	// find and update the document in Mongo, ignore the return (for now)
+	_ = collection.FindOneAndUpdate(context.Background(), filter, update)
+
+	// send the returned document to the email channel
+	metNeedChannel <- id
 
 	// I'm just going to ignore this error and int
-	log.Infof("Found record: %+v", returned)
 	w.WriteHeader(200)
 	_, _ = w.Write([]byte("ok"))
 }

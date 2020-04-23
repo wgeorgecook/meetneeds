@@ -6,7 +6,7 @@ import { Card, List } from 'antd';
 
 const useFetch = (url) => {
     const [{ data, loading, pageNumber }, setState] = useState({
-        data: null,
+        data: {},
         loading: true,
         pageNumber: 1,
     })
@@ -34,7 +34,9 @@ const Needs = () => {
             {
                 (loading)
                 ?  <Card loading={loading} />
-                :  <List
+                :  (data === null)
+                ? <Card>Woah! There are no unmet needs to load. Check back later to meet a need, or click the New Need button to create a new one.</Card>
+                : <List
                         pagination={{
                             onChange: (page) => {
                             setPageNumber(page);
