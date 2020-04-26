@@ -1,9 +1,10 @@
 import React from 'react';
 import { Form, Input } from 'antd'
+import { validatePhoneNumber } from './Utils'
+
 
 const MeetNeed = (props) => {
     const { form } = props;
-
 
     return (
         <Form name="Meet A Need" form={form}>
@@ -19,14 +20,14 @@ const MeetNeed = (props) => {
             <Form.Item
                 name={"phone"}
                 label='Phone'
-                rules={[{ required: false }]}
+                rules={[{ required: false, validator: validatePhoneNumber}]}
             >
                     <Input />
             </Form.Item>
             <Form.Item
                 name="email"
                 label="E-mail"
-                rules={[{type: 'email', message: 'The input is not valid E-mail!'}]}
+                rules={[{type: 'email', message: 'Please enter a valid email'}]}
             >
                 <Input />
             </Form.Item>
