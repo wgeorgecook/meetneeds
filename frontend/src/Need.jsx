@@ -1,7 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 import { Button, Card, Form, Modal } from 'antd';
 import MeetNeed from './MeetNeed';
 import urls from './urls';
+
+
+const confirmModalReducer = (state, action) => {
+    switch(action.type) {
+        case "open":
+            return {confirmModalOpen: true};
+        case "close":
+            return {confirmModalOpen: false};
+        default:
+            return state.confirmModalOpen
+    }
+}
 
 const Need = props => {
 
@@ -9,11 +21,17 @@ const Need = props => {
     const [meetOpen, setMeetOpen] = useState({meetOpen: false})
     const [form] = Form.useForm();
     const url = `${urls.UPDATE_URL}?id=${n._id}`;
+    const [ confirmModalState, confirmModalDispatch ] = useReducer(confirmModalReducer, {confirmModalOpen: false})
 
     const onSuccess = (data) => {
         console.log(data);
         setMeetOpen({meetOpen: false});
+        confirmModalDispatch({type:"open"});
     }
+
+    const closeConfirm = () => {
+        confirmModalDispatch({type:"close"});
+    };
 
     const submitData = (values, cb) => {
         console.log(values);
@@ -69,6 +87,14 @@ const Need = props => {
                     okText="Submit"
                 >
                     <MeetNeed form={form} />
+                </Modal>
+                <Modal
+                    visible={confirmModalState.confirmModalOpen}
+                    onCancel={closeConfirm}
+                    onOk={closeConfirm}
+                    footer={[<Button key="submit" type="primary" onClick={closeConfirm}>Close</Button>]}
+                >
+                    <p>Thank you for voluntering to meet this need! Someone will be in contact with you soon about this.</p>
                 </Modal>
             </Card>
         </div>
