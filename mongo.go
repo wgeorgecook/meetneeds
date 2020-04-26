@@ -127,7 +127,7 @@ func getAll(w http.ResponseWriter, r *http.Request) {
 
 	// find and unmarshal the document to a struct we can return
 	var needs []need
-	cursor, err := collection.Find(ctx, bson.M{"isMet": false})
+	cursor, err := collection.Find(ctx, bson.M{"isMet": false, "approved": true})
 	if err != nil {
 		log.Errorf("error in getRecord: %v", err)
 		w.Write([]byte(err.Error()))
