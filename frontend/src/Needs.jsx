@@ -8,7 +8,10 @@ const useFetch = (url) => {
     const [{ data, loading, pageNumber }, setState] = useState({
         data: {},
         loading: true,
+        timeout: false,
         pageNumber: 1,
+        error: ""
+
     })
 
 
@@ -16,6 +19,7 @@ const useFetch = (url) => {
         fetch(url)
         .then(response => response.json())
         .then(data => setState({data: data, loading: false, pageNumber: 1}))
+        .catch(err => alert("There's been an error: " + err.message + ". Please try again later."))
     }, [url, pageNumber]);
 
     return { data, loading, pageNumber };

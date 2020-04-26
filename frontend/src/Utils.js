@@ -1,10 +1,11 @@
-import { parsePhoneNumber } from 'libphonenumber-js'
+import { parsePhoneNumberFromString } from 'libphonenumber-js'
 
 
 export const validatePhoneNumber = (rule, value, callback) => {
-    let phoneNumber = parsePhoneNumber(value, 'US')
-
-    if (phoneNumber.isValid()) {
+    const phoneNumber = parsePhoneNumberFromString(value, 'US')
+    if (value.length === 0) {
+        callback();
+    } else if (phoneNumber.isValid()) {
         callback();
     } else {
         callback('Please enter a valid 9 digit phone number');
