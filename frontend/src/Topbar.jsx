@@ -32,12 +32,12 @@ const Topbar = (props) => {
     const [ confirmModalState, confirmModalDispatch ] = useReducer(confirmModalReducer, {confirmModalOpen: false})
     const [form] = Form.useForm();
     const url = urls.CREATE_URL;
-    const closeNeed = () => {
-        newNeedDispatch({type:"close"})
-        confirmModalDispatch({type:"open"})
+    const closeNeed = (confirm) => {
+        (confirm) ? confirmModalDispatch({type:"open"}) : newNeedDispatch({type: "close"})
     };
     const closeConfirm = () => {
         confirmModalDispatch({type:"close"});
+        newNeedDispatch({type:"close"})
     };
     const onSuccess = (data) => {
         closeNeed();
@@ -83,13 +83,13 @@ const Topbar = (props) => {
             >
             <Modal
                 visible={newNeedState.newNeedOpen}
-                onCancel={closeNeed}
+                onCancel={() => closeNeed(false)}
                 onOk={() => {
                     form
                       .validateFields()
                       .then(values => {
-                        form.resetFields();
                         submitData(values);
+                        form.resetFields();
                       })}}
             >
                 <p>Plase use this form to submit a new need.</p>
@@ -102,7 +102,7 @@ const Topbar = (props) => {
                 onOk={closeConfirm}
                 footer={[<Button key="submit" type="primary" onClick={closeConfirm}>Close</Button>]}
             >
-                <p>Thank you for submitting your need! This request will be validated before being made public.</p>
+                <p style={{"marginTop": "1em"}}>Thank you for submitting your need! This request will be validated before being made public.</p>
             </Modal>
             <Divider />
         </PageHeader>
