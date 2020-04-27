@@ -51,24 +51,36 @@ func listenForMetNeed() {
 			}
 
 			log.Info("Sending an email to connect for this need")
-			sendEmail(n)
+			sendEmail(n, "met")
 		}
 	}
 }
 
 // sendEmail uses the Mailgun library (https://github.com/mailgun/mailgun-go) to send an email to our admin. Mailgun has
 // a very generous free plan and their in house library is fantastic.
-func sendEmail(n need) {
+func sendEmail(n need, needType string) {
 	// configure the email parameters
+	var subject string
 	recipient := cfg.AdminEmail
 	sender := cfg.FromEmail
-	subject := fmt.Sprintf("%v volunteered to meet %v's need!", n.MeetingUser.Name, n.NeedingUser.Name)
+	if needType == "met" {
+		subject = fmt.Sprintf("%v volunteered to meet %v's need!", n.MeetingUser.Name, n.NeedingUser.Name)
+	} else {
+		subject = fmt.Sprintf("%v submitted a new need!", n.NeedingUser.Name)
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
 	// create the email body from the html template and execute it into a bytes buffer
 	var bodyBuffer bytes.Buffer
-	body, err := template.ParseFiles("met_need.html")
+	var body *template.Template
+	var err error
+	if needType == "met" {
+		body, err = template.ParseFiles("met_need.html")
+	} else {
+		body, err = template.ParseFiles("new_need.html")
+	}
 	if err != nil {
 		log.Errorf("error in sendEmail: %v", err)
 		return
@@ -91,6 +103,6 @@ func sendEmail(n need) {
 		return
 	}
 
-	fmt.Printf("ID: %s Resp: %s\n", id, resp)
+	log.Infof("Sent email to Mailgun. ID: %s Resp: %s\n", id, resp)
 
 }

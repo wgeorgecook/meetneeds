@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{.NeedingUser.Name}} submitted a new need!</title>
+</head>
+<body>
+<h3 style="width: 100%; align-content: center;">Validation Required</h3>
+<p style="width: 70%; align-content: center;">
+    {{.NeedingUser.Name}} submitted a new need!
+</p>
+<p>
+    A new need was submitted on Meet Needs. Please read through the need and the contact information below. Be sure to
+    contact this person if you feel like a follow up is warranted. We're working on an admin portal, but in the meantime
+    forward this email to Will and let him know if we are going to validate this need or should delete it from the
+    database.
+</p>
+<div style="align-content: center">
+    Needer:
+    <ul>
+        <li>Name: {{.NeedingUser.Name}}</li>
+        <li>Phone: {{.NeedingUser.Phone}}</li>
+        <li>Email: {{.NeedingUser.Email}}</li>
+        <li>Need: {{.Need}}</li>
+    </ul>
+
+    <p>If you need support with this need, please reference id {{.ID}}</p>
+</div>
+</body>
+</html>

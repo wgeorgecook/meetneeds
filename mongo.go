@@ -57,7 +57,12 @@ func createDocument(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// set the id on this need to send the email
+	oid := document.InsertedID.(primitive.ObjectID)
+	n.ID = oid.String()
+
 	w.Write([]byte(fmt.Sprintf("document created: %+v", document)))
+	sendEmail(n, "new")
 }
 
 // getDocument expects an id as a query param on an incoming request. It will search the DB for that _id and return

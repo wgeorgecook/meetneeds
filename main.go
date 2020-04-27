@@ -29,6 +29,7 @@ type need struct {
 	MeetingUser user `json:"meetingUser,omitempty" bson:"meetingUser,omitempty"`
 	Need string `json:"need" bson:"need"`
 	IsMet bool  `json:"isMet" bson:"isMet"`
+	Approved bool `json:"approved" bson:"approved"`
 }
 
 type user struct {
