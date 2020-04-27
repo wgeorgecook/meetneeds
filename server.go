@@ -18,10 +18,10 @@ func startServer() {
 
 	router.Handle("/", buildHandler)
 	router.Handle("/static", staticHandler)
-	router.HandleFunc("/create", createDocument)
-	router.HandleFunc("/get", getDocument)
-	router.HandleFunc("/getall", getAll)
-	router.HandleFunc("/update", updateDocument)
+	router.HandleFunc("/api/create", createDocument)
+	router.HandleFunc("/api/get", getDocument)
+	router.HandleFunc("/api/getall", getAll)
+	router.HandleFunc("/api/update", updateDocument)
 
 	// create a new http server with a default timeout for incoming requests
 	timeout := 15 * time.Second
