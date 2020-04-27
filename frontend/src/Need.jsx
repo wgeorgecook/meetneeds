@@ -24,7 +24,6 @@ const Need = props => {
     const [ confirmModalState, confirmModalDispatch ] = useReducer(confirmModalReducer, {confirmModalOpen: false})
 
     const onSuccess = (data) => {
-        console.log(data);
         setMeetOpen({meetOpen: false});
         confirmModalDispatch({type:"open"});
     }
@@ -34,7 +33,6 @@ const Need = props => {
     };
 
     const submitData = (values, cb) => {
-        console.log(values);
         if (!(values.name && values.rationale && (values.phone || values.email))) {
             alert("Please enter your name, how you plan to provide for this need, and at least one way we can contact you.")
             return;

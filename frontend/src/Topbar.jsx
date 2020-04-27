@@ -34,19 +34,15 @@ const Topbar = (props) => {
     const url = urls.CREATE_URL;
     const closeNeed = () => {
         newNeedDispatch({type:"close"})
-        console.log("Opening confirm")
         confirmModalDispatch({type:"open"})
     };
     const closeConfirm = () => {
         confirmModalDispatch({type:"close"});
     };
     const onSuccess = (data) => {
-        console.log(data);
         closeNeed();
     };
     const submitData = (formData) => {
-        console.log("Received this form data: ")
-        console.log(formData)
         if (!(formData.name && formData.need && (formData.phone || formData.email))) {
             alert("Please enter your name, your need, and at least one way we can contact you.")
             return;
