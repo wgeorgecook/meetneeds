@@ -1,7 +1,7 @@
 const urls = {
-    UPDATE_URL: (process.env.NODE_ENV==='development') ? "http://localhost:8080/api/update" : "https://meetneeds.herokuapp.com/api/update",
-    CREATE_URL: (process.env.NODE_ENV==='development') ? "http://localhost:8080/api/create" : "https://meetneeds.herokuapp.com/api/create",
-    GET_URL: (process.env.NODE_ENV==='development') ? "http://localhost:8080/api/getall" : "https://meetneeds.herokuapp.com/api/getall",
+    UPDATE_URL: "http://localhost:8080/api/update",
+    CREATE_URL:  "http://localhost:8080/api/create",
+    GET_URL: "http://localhost:8080/api/getall",
 };
 
 export default urls;

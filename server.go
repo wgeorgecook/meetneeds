@@ -13,11 +13,11 @@ func startServer() {
 	// define the new router, define paths, and handlers on the router
 	router := mux.NewRouter().StrictSlash(true)
 	router.Headers("Access-Control-Allow-Origin", "*")
-	buildHandler := http.FileServer(http.Dir("frontend/build"))
-	staticHandler := http.StripPrefix("/static/", http.FileServer(http.Dir("frontend/build/static")))
+	buildHandler := http.FileServer(http.Dir("./frontend/build"))
+	staticHandler := http.StripPrefix("/static/", http.FileServer(http.Dir("./frontend/build/static")))
 
 	router.Handle("/", buildHandler)
-	router.Handle("/static", staticHandler)
+	router.PathPrefix("/static/").Handler(staticHandler)
 	router.HandleFunc("/api/create", createDocument)
 	router.HandleFunc("/api/get", getDocument)
 	router.HandleFunc("/api/getall", getAll)
