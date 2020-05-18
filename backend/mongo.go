@@ -167,7 +167,10 @@ func getAll(w http.ResponseWriter, r *http.Request) {
 
 	// I'm just going to ignore this error and int
 	log.Infof("Found record: %+v", needs)
-	_, _ = w.Write(jsonData)
+	_, err = w.Write(jsonData)
+	if err != nil {
+		log.Errorf("error in writing to response: %+v", err)
+	}
 }
 
 // updateDocument is called when a meeting user completes the meet a need form and submits it. It expects an id as a
