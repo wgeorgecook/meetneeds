@@ -12,7 +12,10 @@ import (
 func startServer() {
 	// define the new router, define paths, and handlers on the router
 	router := mux.NewRouter().StrictSlash(true)
-	router.Headers("Access-Control-Allow-Origin", "*")
+	router.Headers("Access-Control-Allow-Origin", "https://wix.com")
+	router.Headers("Access-Control-Allow-Origin", "https://baysideplacerville.com")
+	router.Headers("Access-Control-Allow-Origin", "http://baysideplacerville.com")
+	router.Headers("Access-Control-Allow-Origin", "https://aliciam533.wixsite.com")
 	buildHandler := http.FileServer(http.Dir("./frontend/build"))
 	staticHandler := http.StripPrefix("/static/", http.FileServer(http.Dir("./frontend/build/static")))
 
