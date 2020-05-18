@@ -63,7 +63,9 @@ const Need = props => {
                     visible={meetOpen.meetOpen}
                     onCancel={() => setMeetOpen({meetOpen: false})}
                     onOk={() => {
-                        form
+                        (n.sample)
+                        ? alert("You cannot meet the sample need, it is here to demonstrate functionality.")
+                        : form
                             .validateFields()
                             .then(values => {
                             submitData(values);
