@@ -68,8 +68,6 @@ func createDocument(w http.ResponseWriter, r *http.Request) {
 // getDocument expects an id as a query param on an incoming request. It will search the DB for that _id and return
 // the document that it finds (if any).
 func getDocument(w http.ResponseWriter, r *http.Request) {
-	// CORS
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 	defer r.Body.Close()
 	collection := mongoClient.Database(cfg.Database).Collection(cfg.Collection)
 
@@ -108,8 +106,6 @@ func getDocument(w http.ResponseWriter, r *http.Request) {
 // users who wish to be anonymous are respected with regard to the front end. This way, the front end never actually
 // receives any sensitive information. Nonetheless, it needs to be paginated.
 func getAll(w http.ResponseWriter, r *http.Request) {
-	// CORS
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 	defer r.Body.Close()
 	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
 	collection := mongoClient.Database(cfg.Database).Collection(cfg.Collection)
@@ -157,7 +153,8 @@ func getAll(w http.ResponseWriter, r *http.Request) {
 		needs = append(needs, result)
 	}
 	if err := cursor.Err(); err != nil {
-		log.Fatal(err)
+		log.Error(err)
+		return
 	}
 
 	// marshal the struct to send over the wire
