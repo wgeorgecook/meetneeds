@@ -29,7 +29,7 @@ func listenForMetNeed() {
 			log.Infof("Looking for document with _id %v", needID)
 
 			// make a request to the get endpoint for this document
-			getEndpoint := fmt.Sprintf("http://localhost:8080/get?id=%v", needID)
+			getEndpoint := fmt.Sprintf("http://meetneeds.herokuapp.com/api/get?id=%v", needID)
 			resp, err := http.Get(getEndpoint)
 			defer resp.Body.Close()
 			if err != nil {
