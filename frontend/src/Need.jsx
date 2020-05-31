@@ -9,6 +9,7 @@ const Need = props => {
 
     const [n, setNeed] = useState(props);
     const [meetOpen, setMeetOpen] = useState({meetOpen: false})
+    const [checked, setChecked] = useState(n.approved)
     const [confirmModalOpen, setConfirmModalOpen] = useState(false)
     const [form] = Form.useForm();
     const url = `${urls.UPDATE_URL}?id=${n._id}`;
@@ -25,6 +26,25 @@ const Need = props => {
     const toggleApproved = (e, id) => {
         console.log("Checked: " + e.target.checked);
         console.log("ID: " + id);
+
+        // update the UI
+        setChecked(e.target.checked);
+
+        // create the updated object and set options on the request
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            mode: 'no-cors',
+            body: JSON.stringify({"approved": e.target.checked})
+        };
+
+        // make the database request to update the approval status on this need
+        const updateURL = `${urls.UPDATE_URL}?id=${id}&approveChange=${e.target.checked}`
+        console.log("Submitting update to: " + updateURL)
+        fetch(updateURL, requestOptions)
+        .then(resp => resp)
+        .then(data => console.log(data))
+        .catch(err => alert(`Something went wrong: ${err}`));
     }
 
     const submitData = (values, cb) => {
@@ -90,7 +110,7 @@ const Need = props => {
                 >
                     <p style={{"marginTop": "1em"}}>Thank you for voluntering to meet this need! Someone will be in contact with you soon about this.</p>
                 </Modal>
-                { user ? <div style={{"marginTop": "1em"}} ><Checkbox checked={n.approved} onChange={(e) => toggleApproved(e, n._id)}>This need is approved</Checkbox></div> : null}
+                { user ? <div style={{"marginTop": "1em"}} ><Checkbox checked={n.approved && checked} onChange={(e) => toggleApproved(e, n._id)}>This need is approved</Checkbox></div> : null}
             </Card>
         </div>
     )
