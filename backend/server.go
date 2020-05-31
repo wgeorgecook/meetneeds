@@ -16,6 +16,7 @@ func startServer() {
 	router.Headers("Access-Control-Allow-Origin", "https://baysideplacerville.com")
 	router.Headers("Access-Control-Allow-Origin", "http://baysideplacerville.com")
 	router.Headers("Access-Control-Allow-Origin", "https://aliciam533.wixsite.com")
+	router.Headers("Access-Control-Allow-Origin", "http://localhost:3000")
 	buildHandler := http.FileServer(http.Dir("./frontend/build"))
 	staticHandler := http.StripPrefix("/static/", http.FileServer(http.Dir("./frontend/build/static")))
 
@@ -25,7 +26,6 @@ func startServer() {
 	router.HandleFunc("/api/get", getDocument)
 	router.HandleFunc("/api/getall", getAll)
 	router.HandleFunc("/api/update", updateDocument)
-
 	// create a new http server with a default timeout for incoming requests
 	timeout := 15 * time.Second
 	srv = &http.Server{

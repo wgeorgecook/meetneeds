@@ -110,6 +110,10 @@ func getAll(w http.ResponseWriter, r *http.Request) {
 	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
 	collection := mongoClient.Database(cfg.Database).Collection(cfg.Collection)
 
+	// check if an admin is authenticated on this request
+	var admin bool
+	admin = true
+
 	// Get the Page Number
 	var pageNumber int
 	var err error
@@ -128,7 +132,13 @@ func getAll(w http.ResponseWriter, r *http.Request) {
 
 	// find and unmarshal the document to a struct we can return
 	var needs []need
-	cursor, err := collection.Find(ctx, bson.M{"isMet": false, "approved": true})
+	var find bson.M
+	if admin {
+		find = bson.M{}
+	} else {
+		find = bson.M{"isMet": false, "approved": true}
+	}
+	cursor, err := collection.Find(ctx, find)
 	if err != nil {
 		log.Errorf("error in getRecord: %v", err)
 		w.Write([]byte(err.Error()))
@@ -143,13 +153,16 @@ func getAll(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte(err.Error()))
 			return
 		}
-		// filter out senstive info on network request
-		result.NeedingUser.Phone = ""
-		result.NeedingUser.Email = ""
-		if result.NeedingUser.Anonymous {
-			result.NeedingUser.Name = "Anonymous"
+		// filter out senstive info on network request for non-admin requests
+		if !admin {
+			result.NeedingUser.Phone = ""
+			result.NeedingUser.Email = ""
+			if result.NeedingUser.Anonymous {
+				result.NeedingUser.Name = "Anonymous"
+			}
+			result.MeetingUser = user{}
 		}
-		result.MeetingUser = user{}
+
 		needs = append(needs, result)
 	}
 	if err := cursor.Err(); err != nil {
@@ -167,6 +180,10 @@ func getAll(w http.ResponseWriter, r *http.Request) {
 
 	// I'm just going to ignore this error and int
 	log.Infof("Found record: %+v", needs)
+
+	// make sure this is off for prod
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+
 	_, err = w.Write(jsonData)
 	if err != nil {
 		log.Errorf("error in writing to response: %+v", err)
@@ -182,6 +199,16 @@ func updateDocument(w http.ResponseWriter, r *http.Request) {
 
 	id := r.URL.Query()["id"][0]
 
+	// check if this is a change in approval status
+	approveChange := false
+	approval := r.URL.Query()["approveChange"]
+	if len(approval) > 0 {
+		log.Info("This is an approval change")
+		log.Infof("Approval change: %v", approval[0])
+		approveChange = true
+	}
+
+
 	// create an OID bson primitive based on the ID that comes in on the request
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -189,6 +216,8 @@ func updateDocument(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(err.Error()))
 		return
 	}
+
+	log.Infof("Looking for record with this id: %v", oid)
 
 
 	// unmarshal the incoming body into our user struct
@@ -209,16 +238,29 @@ func updateDocument(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Infof("Will update with this: %+v", n)
-	update := bson.M{"$set": bson.M{"isMet": true, "meetingUser": n.MeetingUser}}
+
+	// updated based on either meeting a need or setting approved / not approved
+	var update primitive.M
+	if approveChange {
+		update = bson.M{"$set": bson.M{"approved": n.Approved}}
+	} else {
+		update = bson.M{"$set": bson.M{"isMet": true, "meetingUser": n.MeetingUser}}
+	}
 
 	log.Info(fmt.Sprintf("Updating record %v with %+v", n.ID, update))
 	// find and update the document in Mongo, ignore the return (for now)
 	_ = collection.FindOneAndUpdate(context.Background(), filter, update)
 
-	// send the returned document to the email channel
-	metNeedChannel <- id
+	// send the returned document to the email channel if this isn't just an approval change
+	if !approveChange {
+		metNeedChannel <- id
+	}
 
 	// I'm just going to ignore this error and int
 	w.WriteHeader(200)
+
+	// make sure this is off for prod
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+
 	_, _ = w.Write([]byte("ok"))
 }
