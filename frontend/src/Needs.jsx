@@ -22,7 +22,7 @@ const useFetch = (url, user) => {
         .then(response => response.json())
         .then(data => setState({data: data, loading: false, pageNumber: 1}))
         .catch(err => alert("There's been an error: " + err.message + ". Please try again later."))
-    }, [url, pageNumber, authHeader]);
+    }, [url, pageNumber]);
 
     return { data, loading, pageNumber };
 };
@@ -30,7 +30,7 @@ const useFetch = (url, user) => {
 const Needs = () => {
     const [ pageNumber, setPageNumber ] = useState(1);
     const [ user, setUser ] = useState(null)
-    const queryURL = user ? `${urls.ADMIN.GET_URL}?pagenumber=${pageNumber}` : `${urls.GET_URL}?pagenumber=${pageNumber}`;
+    const queryURL = `${urls.GET_URL}?pagenumber=${pageNumber}`;
     const { data, loading, itemTotal } = useFetch(queryURL, user);
 
     // TODO: actually get the end page number to set the pagination to
