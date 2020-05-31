@@ -1,4 +1,5 @@
 import React, { useReducer } from 'react';
+import Auth from './Auth'
 import NewNeed from './NewNeed';
 import urls from './urls';
 import { Button, Divider, Form, Modal, PageHeader } from 'antd';
@@ -28,10 +29,14 @@ const confirmModalReducer = (state, action) => {
 
 
 const Topbar = (props) => {
+    const { onAuthSuccess, onAuthFailure, user } = props;
+
     const [ newNeedState, newNeedDispatch ] = useReducer(newNeedReducer, {newNeedOpen: false});
     const [ confirmModalState, confirmModalDispatch ] = useReducer(confirmModalReducer, {confirmModalOpen: false})
-    const [form] = Form.useForm();
+    const [ form ] = Form.useForm();
+
     const url = urls.CREATE_URL;
+
     const closeNeed = (confirm) => {
         (confirm) ? confirmModalDispatch({type:"open"}) : newNeedDispatch({type: "close"})
     };
@@ -104,6 +109,9 @@ const Topbar = (props) => {
             >
                 <p style={{"marginTop": "1em"}}>Thank you for submitting your need! This request will be validated before being made public.</p>
             </Modal>
+            {
+                user ? <div>Hello, {user?.Tt?.sW}!</div> : <Auth onAuthSuccess={(vals) => onAuthSuccess(vals)} onAuthFailure={() => onAuthFailure(null)}/>
+            }
             <Divider />
         </PageHeader>
     )

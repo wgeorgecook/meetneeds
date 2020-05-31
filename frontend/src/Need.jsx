@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Card, Form, Modal } from 'antd';
+import { Button, Card, Form, Modal, Checkbox } from 'antd';
 import MeetNeed from './MeetNeed';
 import urls from './urls';
 
 const Need = props => {
+
+    const { onMetNeed, user } = props;
 
     const [n, setNeed] = useState(props);
     const [meetOpen, setMeetOpen] = useState({meetOpen: false})
@@ -19,6 +21,11 @@ const Need = props => {
         setConfirmModalOpen(false);
         setMeetOpen({meetOpen: false});
     };
+
+    const toggleApproved = (e, id) => {
+        console.log("Checked: " + e.target.checked);
+        console.log("ID: " + id);
+    }
 
     const submitData = (values, cb) => {
         if (!(values.name && values.rationale && (values.phone || values.email))) {
@@ -47,7 +54,7 @@ const Need = props => {
         }
 
         sendData();
-        props.onMetNeed();
+        onMetNeed();
     };
 
     useEffect(() => {
@@ -83,6 +90,7 @@ const Need = props => {
                 >
                     <p style={{"marginTop": "1em"}}>Thank you for voluntering to meet this need! Someone will be in contact with you soon about this.</p>
                 </Modal>
+                { user ? <Checkbox checked={n.approved} onChange={(e) => toggleApproved(e, n.id)}>This need is approved</Checkbox> : null}
             </Card>
         </div>
     )

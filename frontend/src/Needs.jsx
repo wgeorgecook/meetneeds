@@ -4,7 +4,7 @@ import Need from './Need'
 import urls from './urls'
 import { Card, List } from 'antd';
 
-const useFetch = (url) => {
+const useFetch = (url, user) => {
     const [{ data, loading, pageNumber }, setState] = useState({
         data: {},
         loading: true,
@@ -14,27 +14,34 @@ const useFetch = (url) => {
 
     })
 
+    const authHeader = user ? {'Authorization': `Bearer ${user?.wc?.access_token}`} : {}
+
 
     useEffect(() => {
-        fetch(url)
+        fetch(url, {headers: authHeader})
         .then(response => response.json())
         .then(data => setState({data: data, loading: false, pageNumber: 1}))
         .catch(err => alert("There's been an error: " + err.message + ". Please try again later."))
-    }, [url, pageNumber]);
+    }, [url, pageNumber, authHeader]);
 
     return { data, loading, pageNumber };
 };
 
-
 const Needs = () => {
     const [ pageNumber, setPageNumber ] = useState(1);
-    const queryURL = `${urls.GET_URL}?pagenumber=${pageNumber}`;
-    const { data, loading, itemTotal } = useFetch(queryURL);
+    const [ user, setUser ] = useState(null)
+    const queryURL = user ? `${urls.ADMIN.GET_URL}?pagenumber=${pageNumber}` : `${urls.GET_URL}?pagenumber=${pageNumber}`;
+    const { data, loading, itemTotal } = useFetch(queryURL, user);
 
     // TODO: actually get the end page number to set the pagination to
     return (
         <div>
-            <Topbar onNewNeed={() => setPageNumber(0)}/>
+            <Topbar
+                onNewNeed={() => setPageNumber(0)}
+                onAuthSuccess={(vals) => setUser(vals)}
+                onAuthFailure={() => setUser(null)}
+                user={user}
+            />
             {
                 (loading)
                 ?  <Card loading={loading} />
@@ -60,7 +67,7 @@ const Needs = () => {
                         total={itemTotal}
                         renderItem={(n) => (
                             <List.Item>
-                                <Need onMetNeed={() => setPageNumber(pageNumber + 1)} {...n}/>
+                                <Need onMetNeed={() => setPageNumber(pageNumber + 1)} {...n} user={user}/>
                             </List.Item>
                         )}
                     />
