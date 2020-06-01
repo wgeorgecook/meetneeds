@@ -14,37 +14,41 @@ const useFetch = (url, user) => {
 
     })
 
-    const authHeader = user ? {'Authorization': `Bearer ${user?.wc?.access_token}`} : {}
+    let requestHeaders = {
+        Accept: "application/json",
+    }
+
+    if (user) { requestHeaders["Authorization"] = `Bearer ${user?.wc?.access_token}`}
 
 
     useEffect(() => {
-        fetch(url, {headers: authHeader})
+        fetch(url, {headers: requestHeaders})
         .then(response => response.json())
-        .then(data => setState({data: data, loading: false, pageNumber: 1}))
+        .then(data => setState({data: data, loading: false, pageNumber: pageNumber}))
         .catch(err => alert("There's been an error: " + err.message + ". Please try again later."))
-    }, [url, pageNumber]);
+    }, []);
 
     return { data, loading, pageNumber };
 };
 
-const Needs = () => {
+const Needs = (props) => {
+    const { user, onAuthSuccess, onAuthFailure } = props;
     const [ pageNumber, setPageNumber ] = useState(1);
-    const [ user, setUser ] = useState(null)
     const queryURL = `${urls.GET_URL}?pagenumber=${pageNumber}`;
-    const { data, loading, itemTotal } = useFetch(queryURL, user);
+    const { data, loading, itemTotal } = useFetch(queryURL, user); // fetches the data from the backend
 
     // TODO: actually get the end page number to set the pagination to
     return (
         <div>
             <Topbar
                 onNewNeed={() => setPageNumber(0)}
-                onAuthSuccess={(vals) => setUser(vals)}
-                onAuthFailure={() => setUser(null)}
+                onAuthSuccess={(vals) => onAuthSuccess(vals)}
+                onAuthFailure={() => onAuthFailure()}
                 user={user}
             />
             {
                 (loading)
-                ?  <Card loading={loading} />
+                ?  <Card loading />
                 :  (data === null)
                 ? <Card>Woah! There are no unmet needs to load. Check back later to meet a need, or click the New Need button to create a new one.</Card>
                 : <List
@@ -67,7 +71,7 @@ const Needs = () => {
                         total={itemTotal}
                         renderItem={(n) => (
                             <List.Item>
-                                <Need onMetNeed={() => setPageNumber(pageNumber + 1)} {...n} user={user}/>
+                                <Need onMetNeed={() => setPageNumber(pageNumber)} {...n} user={user}/>
                             </List.Item>
                         )}
                     />

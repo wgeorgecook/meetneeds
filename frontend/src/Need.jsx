@@ -26,6 +26,7 @@ const Need = props => {
     const toggleApproved = (e, id) => {
         console.log("Checked: " + e.target.checked);
         console.log("ID: " + id);
+        console.log("ID Token: ", user.wc.access_token);
 
         // update the UI
         setChecked(e.target.checked);
@@ -33,14 +34,16 @@ const Need = props => {
         // create the updated object and set options on the request
         const requestOptions = {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', "Authorization": `Bearer ${user?.wc?.access_token}` },
             mode: 'no-cors',
             body: JSON.stringify({"approved": e.target.checked})
         };
 
+        console.log("Request options: ")
+        console.log(requestOptions);
+
         // make the database request to update the approval status on this need
         const updateURL = `${urls.UPDATE_URL}?id=${id}&approveChange=${e.target.checked}`
-        console.log("Submitting update to: " + updateURL)
         fetch(updateURL, requestOptions)
         .then(resp => resp)
         .then(data => console.log(data))
