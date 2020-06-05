@@ -206,9 +206,6 @@ func getAll(w http.ResponseWriter, r *http.Request) {
 	// I'm just going to ignore this error and int
 	log.Infof("Found record: %+v", needs)
 
-	// make sure this is off for prod
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-
 	_, err = w.Write(jsonData)
 	if err != nil {
 		log.Errorf("error in writing to response: %+v", err)
@@ -316,9 +313,6 @@ func updateDocument(w http.ResponseWriter, r *http.Request) {
 
 	// I'm just going to ignore this error and int
 	w.WriteHeader(200)
-
-	// make sure this is off for prod
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 
 	_, _ = w.Write([]byte("ok"))
 }
