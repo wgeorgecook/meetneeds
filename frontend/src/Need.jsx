@@ -113,7 +113,7 @@ const Need = props => {
                         <Checkbox checked={n.approved || checked} onChange={(e) => toggleApproved(e, n._id)}>This need is approved</Checkbox>
                         {(n.isMet)
                         ? <p style={{"marginTop": "1em"}}>{n.meetingUser.name} volunteered to meet this need.</p>
-                        : null}
+                        : <p style={{"marginTop": "1em"}}>This need is still unmet.</p>}
                       </div>
                     :
                     null
