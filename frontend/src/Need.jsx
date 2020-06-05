@@ -108,7 +108,7 @@ const Need = props => {
                 >
                     <p style={{"marginTop": "1em"}}>Thank you for voluntering to meet this need! Someone will be in contact with you soon about this.</p>
                 </Modal>
-                { user ? <div style={{"marginTop": "1em"}} ><Checkbox checked={n.approved && checked} onChange={(e) => toggleApproved(e, n._id)}>This need is approved</Checkbox></div> : null}
+                { user ? <div style={{"marginTop": "1em"}} ><Checkbox checked={n.approved || checked} onChange={(e) => toggleApproved(e, n._id)}>This need is approved</Checkbox></div> : null}
             </Card>
         </div>
     )
