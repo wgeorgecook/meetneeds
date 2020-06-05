@@ -26,7 +26,7 @@ const useFetch = (url, user) => {
         .then(response => response.json())
         .then(data => setState({data: data, loading: false, pageNumber: pageNumber}))
         .catch(err => alert("There's been an error: " + err.message + ". Please try again later."))
-    }, []);
+    }, [user]);
 
     return { data, loading, pageNumber };
 };
