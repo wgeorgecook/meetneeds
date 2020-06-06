@@ -19,6 +19,7 @@ func startServer() {
 		"https://baysideplacerville.com",
 		"http://localhost:3000",
 		"https://meetneeds.herokuapp.com",
+		"http://meetneeds.herokuapp.com",
 	})
 	methods := handlers.AllowedMethods([]string{"POST", "DELETE", "GET", "PATCH", "UPDATE", "PUT"})
 	buildHandler := http.FileServer(http.Dir("./frontend/build"))
