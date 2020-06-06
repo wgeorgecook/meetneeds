@@ -14,7 +14,12 @@ func startServer() {
 	// define the new router, define paths, and handlers on the router
 	router := mux.NewRouter().StrictSlash(true)
 	headers := handlers.AllowedHeaders([]string{"Content-Type", "Authorization"})
-	origins := handlers.AllowedOrigins([]string{"https://wix.com", "https://baysideplacerville.com", "http://localhost:3000"})
+	origins := handlers.AllowedOrigins([]string{
+		"https://wix.com",
+		"https://baysideplacerville.com",
+		"http://localhost:3000",
+		"https://meetneeds.herokuapp.com",
+	})
 	methods := handlers.AllowedMethods([]string{"POST", "DELETE", "GET", "PATCH", "UPDATE", "PUT"})
 	buildHandler := http.FileServer(http.Dir("./frontend/build"))
 	staticHandler := http.StripPrefix("/static/", http.FileServer(http.Dir("./frontend/build/static")))
