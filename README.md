@@ -3,6 +3,10 @@
 You and your neighbors face many challenges day in and day out. This is even more true in the age of Covid-19. 
 At my church we wanted to find a way to help broker connections between people looking for a way to lend a hand and those
 who could use some help. MeetNeeds is the result of this desire.
+
+Remember also, black lives matter. If you are a white person like myself, chose to use your privilege as a shield to
+protect the oppressed, and a microphone to amplify their voices and concerns. The power of Jesus is within all of the 
+Church and by this power we can overturn systematic racism and bring justice and healing to the world.
 ## Connecting Community Members In An Age of Crisis
 
 MeetNeeds allows people to register the needs they have. These can be trivial to substantial, monetary, or based on some

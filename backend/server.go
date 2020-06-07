@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/handlers"
 	"net/http"
 	"time"
 )
@@ -12,10 +13,15 @@ import (
 func startServer() {
 	// define the new router, define paths, and handlers on the router
 	router := mux.NewRouter().StrictSlash(true)
-	router.Headers("Access-Control-Allow-Origin", "https://wix.com")
-	router.Headers("Access-Control-Allow-Origin", "https://baysideplacerville.com")
-	router.Headers("Access-Control-Allow-Origin", "http://baysideplacerville.com")
-	router.Headers("Access-Control-Allow-Origin", "https://aliciam533.wixsite.com")
+	headers := handlers.AllowedHeaders([]string{"Content-Type", "Authorization"})
+	origins := handlers.AllowedOrigins([]string{
+		"https://wix.com",
+		"https://baysideplacerville.com",
+		"http://localhost:3000",
+		"https://meetneeds.herokuapp.com",
+		"http://meetneeds.herokuapp.com",
+	})
+	methods := handlers.AllowedMethods([]string{"POST", "DELETE", "GET", "PATCH", "UPDATE", "PUT"})
 	buildHandler := http.FileServer(http.Dir("./frontend/build"))
 	staticHandler := http.StripPrefix("/static/", http.FileServer(http.Dir("./frontend/build/static")))
 
@@ -25,7 +31,6 @@ func startServer() {
 	router.HandleFunc("/api/get", getDocument)
 	router.HandleFunc("/api/getall", getAll)
 	router.HandleFunc("/api/update", updateDocument)
-
 	// create a new http server with a default timeout for incoming requests
 	timeout := 15 * time.Second
 	srv = &http.Server{
@@ -39,5 +44,5 @@ func startServer() {
 
 	// start the server
 	log.Info("New server started")
-	log.Fatal(srv.ListenAndServe())
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", cfg.Port), handlers.CORS(headers, origins, methods)(router)))
 }

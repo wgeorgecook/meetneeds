@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -106,9 +107,35 @@ func getDocument(w http.ResponseWriter, r *http.Request) {
 // users who wish to be anonymous are respected with regard to the front end. This way, the front end never actually
 // receives any sensitive information. Nonetheless, it needs to be paginated.
 func getAll(w http.ResponseWriter, r *http.Request) {
+	log.Info("Incoming getAll request")
 	defer r.Body.Close()
 	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
 	collection := mongoClient.Database(cfg.Database).Collection(cfg.Collection)
+
+	// check if an admin is authenticated on this request
+	// grab the token on the incoming request
+	log.Infof("All headers: %+v", r.Header)
+	authHeader := r.Header.Get("Authorization")
+	var admin bool
+	if authHeader != "" {
+		// there's an authorization header on this request in the form "Bearer idtoken" so we strip everything away
+		// but the token
+		log.Info("Auth header found on this request")
+		log.Infof("Authorization header: %s", authHeader)
+
+		// this is a little tricky. We strip out "Bearer", but are left with " tokenString", so we get an array
+		// ["Bearer", " tokenString"], so we take the [1] element, " tokenString", and then take everything past the
+		// 0th element (which is an empty character"
+		tokenString := strings.Split(authHeader, "Bearer")[1][1:]
+
+		// now to make sure this person is who they say they are AND belong to our organization, we verify it with
+		// Google
+		admin = verifyToken(tokenString)
+	} else {
+		// no attempt to authorize
+		log.Info("No auth header found on this request")
+		admin = false
+	}
 
 	// Get the Page Number
 	var pageNumber int
@@ -128,7 +155,15 @@ func getAll(w http.ResponseWriter, r *http.Request) {
 
 	// find and unmarshal the document to a struct we can return
 	var needs []need
-	cursor, err := collection.Find(ctx, bson.M{"isMet": false, "approved": true})
+	var find bson.M
+	if admin {
+		// return everything if this is an admin
+		find = bson.M{}
+	} else {
+		// otherwise return ONLY unmet needs that are approved
+		find = bson.M{"isMet": false, "approved": true}
+	}
+	cursor, err := collection.Find(ctx, find)
 	if err != nil {
 		log.Errorf("error in getRecord: %v", err)
 		w.Write([]byte(err.Error()))
@@ -143,13 +178,16 @@ func getAll(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte(err.Error()))
 			return
 		}
-		// filter out senstive info on network request
-		result.NeedingUser.Phone = ""
-		result.NeedingUser.Email = ""
-		if result.NeedingUser.Anonymous {
-			result.NeedingUser.Name = "Anonymous"
+		// filter out senstive info on network request for non-admin requests
+		if !admin {
+			result.NeedingUser.Phone = ""
+			result.NeedingUser.Email = ""
+			if result.NeedingUser.Anonymous {
+				result.NeedingUser.Name = "Anonymous"
+			}
+			result.MeetingUser = user{}
 		}
-		result.MeetingUser = user{}
+
 		needs = append(needs, result)
 	}
 	if err := cursor.Err(); err != nil {
@@ -167,6 +205,7 @@ func getAll(w http.ResponseWriter, r *http.Request) {
 
 	// I'm just going to ignore this error and int
 	log.Infof("Found record: %+v", needs)
+
 	_, err = w.Write(jsonData)
 	if err != nil {
 		log.Errorf("error in writing to response: %+v", err)
@@ -182,6 +221,49 @@ func updateDocument(w http.ResponseWriter, r *http.Request) {
 
 	id := r.URL.Query()["id"][0]
 
+	// check if an admin is authenticated on this request
+	// grab the token on the incoming request
+	log.Infof("All headers: %+v", r.Header)
+	authHeader := r.Header.Get("Authorization")
+	var admin bool
+	if authHeader != "" {
+		// there's an authorization header on this request in the form "Bearer idtoken" so we strip everything away
+		// but the token
+		log.Info("Auth header found on this request")
+		log.Infof("Authorization header: %s", authHeader)
+
+		// this is a little tricky. We strip out "Bearer", but are left with " tokenString", so we get an array
+		// ["Bearer", " tokenString"], so we take the [1] element, " tokenString", and then take everything past the
+		// 0th element (which is an empty character"
+		tokenString := strings.Split(authHeader, "Bearer")[1][1:]
+
+		// now to make sure this person is who they say they are AND belong to our organization, we verify it with
+		// Google
+		admin = verifyToken(tokenString)
+	} else {
+		// no attempt to authorize
+		log.Info("No auth header found on this request")
+		admin = false
+	}
+
+	// check if this is a change in approval status
+	approveChange := false
+	approval := r.URL.Query()["approveChange"]
+	if len(approval) > 0 {
+		log.Info("This is an approval change")
+		log.Infof("Approval change: %v", approval[0])
+		approveChange = true
+	}
+
+	// now we check and make sure that if this person is trying to update an approval that they are an admin
+	// if they are not an admin and are trying to change approval status, we reject them with an unauthorized
+	if approveChange && !admin {
+		w.WriteHeader(401)
+		w.Write([]byte("You are not authorized to make this request"))
+		return
+	}
+
+
 	// create an OID bson primitive based on the ID that comes in on the request
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -190,8 +272,10 @@ func updateDocument(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Infof("Looking for record with this id: %v", oid)
 
-	// unmarshal the incoming body into our user struct
+
+	// unmarshal the incoming body into our need struct
 	var n need
 	filter := bson.M{"_id": oid}
 
@@ -209,16 +293,26 @@ func updateDocument(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Infof("Will update with this: %+v", n)
-	update := bson.M{"$set": bson.M{"isMet": true, "meetingUser": n.MeetingUser}}
+
+	// updated based on either meeting a need or setting approved / not approved
+	var update primitive.M
+	if approveChange {
+		update = bson.M{"$set": bson.M{"approved": n.Approved}}
+	} else {
+		update = bson.M{"$set": bson.M{"isMet": true, "meetingUser": n.MeetingUser}}
+	}
 
 	log.Info(fmt.Sprintf("Updating record %v with %+v", n.ID, update))
 	// find and update the document in Mongo, ignore the return (for now)
 	_ = collection.FindOneAndUpdate(context.Background(), filter, update)
 
-	// send the returned document to the email channel
-	metNeedChannel <- id
+	// send the returned document to the email channel if this isn't just an approval change
+	if !approveChange {
+		metNeedChannel <- id
+	}
 
 	// I'm just going to ignore this error and int
 	w.WriteHeader(200)
+
 	_, _ = w.Write([]byte("ok"))
 }
