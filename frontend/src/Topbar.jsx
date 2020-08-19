@@ -109,7 +109,7 @@ const Topbar = (props) => {
                 <p style={{"marginTop": "1em"}}>Thank you for submitting your need! This request will be validated before being made public.</p>
             </Modal>
             {
-                user ? <div>Hello, {user?.Tt?.sW}!</div> : <Auth onAuthSuccess={(vals) => onAuthSuccess(vals)} onAuthFailure={() => onAuthFailure(null)}/>
+                user ? <div>Hello, {user?.profileObj?.givenName || "Admin"}!</div> : <Auth onAuthSuccess={(vals) => onAuthSuccess(vals)} onAuthFailure={() => onAuthFailure(null)}/>
             }
             <Divider />
         </PageHeader>
