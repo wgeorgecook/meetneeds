@@ -2,5 +2,6 @@
 .idea/
 vendor/
 meetneeds
+.env
 backend/.env
 meetneeds.exe
