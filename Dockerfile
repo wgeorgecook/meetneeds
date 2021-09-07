@@ -16,8 +16,8 @@ RUN npm run build
 # that we will deploy to production
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates
-COPY --from=backend /backend ./
-COPY --from=frontend /frontend ./frontend
+COPY --from=backend /backend/meetneeds ./
+COPY --from=frontend /frontend/build ./frontend/build
 RUN chmod +x ./meetneeds
 EXPOSE 8080
 CMD ./meetneeds
